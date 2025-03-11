@@ -1,6 +1,7 @@
 import React from "react";
 import { createBrowserRouter } from "react-router-dom";
 import Home from "./pages/Home";
+import Shop from "./pages/Shop";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import PrivateRoute from "./components/Protected/PrivateRoute";
@@ -9,6 +10,10 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
+  },
+  {
+    path: "/shop/:category",
+    element: <Shop />,
   },
   {
     path: "/admin",
