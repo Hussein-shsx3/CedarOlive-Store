@@ -43,32 +43,32 @@ const Footer = () => {
             <h3 className="text-gray-400 uppercase mb-6">HOMEABLE</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/shop" className="hover:text-gray-300">
+                <Link to="/shop/All" className="hover:text-gray-300">
                   Shop
                 </Link>
               </li>
               <li>
-                <Link to="/wall-art" className="hover:text-gray-300">
+                <Link to="/shop/Wall Art" className="hover:text-gray-300">
                   Wall Art
                 </Link>
               </li>
               <li>
-                <Link to="/vases" className="hover:text-gray-300">
+                <Link to="/shop/Vases" className="hover:text-gray-300">
                   Vases
                 </Link>
               </li>
               <li>
-                <Link to="/living-room" className="hover:text-gray-300">
+                <Link to="/shop/Living Room" className="hover:text-gray-300">
                   Living Room
                 </Link>
               </li>
               <li>
-                <Link to="/lighting" className="hover:text-gray-300">
+                <Link to="/shop/Lighting" className="hover:text-gray-300">
                   Lighting
                 </Link>
               </li>
               <li>
-                <Link to="/decor" className="hover:text-gray-300">
+                <Link to="/shop/Decor" className="hover:text-gray-300">
                   Decor
                 </Link>
               </li>

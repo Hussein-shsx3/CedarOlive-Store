@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { removeFromCart, clearCart } from "../../redux/cartSlice";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Connect to Redux store
+  const { cartItems, totalAmount } = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
 
   const navLinks = [
     { title: "About", path: "/about" },
@@ -16,6 +23,21 @@ const Header = () => {
     { title: "Wall Art", path: "/shop/Wall Art" },
     { title: "Lighting", path: "/shop/Lighting" },
   ];
+
+  const toggleCart = () => {
+    setIsCartOpen(!isCartOpen);
+    // Close menu if open
+    if (isMenuOpen) setIsMenuOpen(false);
+  };
+
+  const handleRemoveItem = (id) => {
+    dispatch(removeFromCart(id));
+  };
+
+  const handleClearCart = () => {
+    dispatch(clearCart());
+    setIsCartOpen(false);
+  };
 
   return (
     <div className="w-full sticky top-0 z-50">
@@ -71,7 +93,10 @@ const Header = () => {
                 Purchase
               </button>
               <div className="relative">
-                <button className="p-1 hover:text-secondary transition duration-200">
+                <button
+                  className="p-1 hover:text-secondary transition duration-200"
+                  onClick={toggleCart}
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-6 w-6"
@@ -88,8 +113,110 @@ const Header = () => {
                   </svg>
                 </button>
                 <span className="absolute -top-1 -right-1 bg-black text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                  0
+                  {cartItems.length}
                 </span>
+
+                {/* Cart Overlay */}
+                <div
+                  className={`fixed top-0 right-0 w-full h-full bg-black bg-opacity-75 z-40 transition-opacity duration-300 ${
+                    isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                  }`}
+                  onClick={() => setIsCartOpen(false)}
+                ></div>
+
+                {/* Cart Dropdown */}
+                <div
+                  className={`fixed top-0 right-0 w-80 lg:w-1/4 bg-white shadow-lg z-50 h-full transition-transform duration-300 ease-in-out transform ${
+                    isCartOpen ? "translate-x-0" : "translate-x-full"
+                  } flex flex-col`}
+                >
+                  <div className="flex-1 flex flex-col">
+                    <div className="p-4 border-b flex justify-between items-center">
+                      <h3 className="text-2xl">Your Cart</h3>
+                      <button
+                        className="text-gray-500 hover:text-black"
+                        onClick={() => setIsCartOpen(false)}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto">
+                      {cartItems.length === 0 ? (
+                        <div className="p-8 text-center text-gray-500">
+                          Your cart is empty
+                        </div>
+                      ) : (
+                        cartItems.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex items-center p-4 border-b"
+                          >
+                            <div className="w-20 h-24 flex-shrink-0 mr-4">
+                              <img
+                                src={item.image || "/api/placeholder/80/96"}
+                                alt={item.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="flex-grow">
+                              <h4 className="font-medium">{item.title}</h4>
+                              <div className="flex justify-between items-center mt-2">
+                                <p className="text-gray-900">{item.price}</p>
+                                <div className="flex items-center">
+                                  <input
+                                    type="number"
+                                    value={item.quantity || 1}
+                                    className="w-12 p-1 border text-center"
+                                    min="1"
+                                    readOnly
+                                  />
+                                </div>
+                              </div>
+                              <button
+                                className="text-gray-500 text-sm mt-1 hover:text-black"
+                                onClick={() => handleRemoveItem(item.id)}
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="p-4 border-t mt-auto">
+                    <div className="flex justify-between mb-4">
+                      <span className="font-medium">Subtotal</span>
+                      <span className="font-medium">
+                        ${totalAmount.toFixed(2)} USD
+                      </span>
+                    </div>
+                    <button className="w-full bg-secondary text-white py-3 px-6 hover:bg-[#aa7b5a] transition duration-200 mb-2">
+                      Continue to Checkout
+                    </button>
+                    {cartItems.length > 0 && (
+                      <button
+                        className="w-full border border-gray-300 py-2 px-6 hover:bg-gray-100 transition duration-200 text-sm"
+                        onClick={handleClearCart}
+                      >
+                        Clear Cart
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
               <button
                 className="md:hidden p-1 hover:text-gray-600 transition duration-200"

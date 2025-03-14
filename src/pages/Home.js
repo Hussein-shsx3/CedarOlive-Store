@@ -8,10 +8,12 @@ import Section5 from "../components/homePage/section5";
 import Section6 from "../components/homePage/section6";
 import Section7 from "../components/homePage/section7";
 import Footer from "../components/footer/footer";
+import ScrollToTop from "../components/scrollToTop";
 
 function Home() {
   return (
     <div className="flex flex-col justify-center items-center">
+      <ScrollToTop />
       <Header />
       <Section1 />
       <Section2 />

@@ -36,7 +36,11 @@ const Section5 = () => {
       {/* Bottom Product Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mt-3">
         {products.map((product) =>
-          product.id > 4 && product.id < 9 ? <Product product={product} /> : ""
+          product.id > 4 && product.id < 9 ? (
+            <Product key={product.id} product={product} />
+          ) : (
+            ""
+          )
         )}
       </div>
     </section>

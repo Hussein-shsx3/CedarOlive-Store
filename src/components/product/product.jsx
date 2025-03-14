@@ -3,7 +3,11 @@ import { Link } from "react-router-dom";
 
 const Product = ({ product }) => {
   return (
-    <Link to="" key={product.id} className="group block space-y-2 w-full">
+    <Link
+      to={`/product/${product.id}`}
+      key={product.id}
+      className="group block space-y-2 w-full"
+    >
       {/* Image container with taller aspect ratio */}
       <div className="relative aspect-[5/6] overflow-hidden rounded-sm">
         <img

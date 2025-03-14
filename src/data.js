@@ -5,7 +5,8 @@ export const products = [
     brand: "DICKINSON",
     price: "$34.00 USD",
     category: "Wall Art",
-    image: "/Images/62e19220374bda5d3584e3f6_wall hanger-p-500.jpeg",
+    image:
+      "/Images/Snapinsta.app_476753627_18018260882662369_5273033937668711870_n_1080.jpg",
   },
   {
     id: 2,
@@ -13,7 +14,8 @@ export const products = [
     brand: "DICKINSON",
     price: "$240.00 USD",
     category: "Vases",
-    image: "/Images/62d9c5fd0d2a19b3f6d14b2a_wooden vase-p-500.jpeg",
+    image:
+      "/Images/Snapinsta.app_330759998_1303294373580498_1634973357408973697_n_1080.jpg",
   },
   {
     id: 3,
@@ -22,7 +24,8 @@ export const products = [
     price: "$54.00 USD",
     oldPrice: "$54.99 USD",
     category: "Living Room",
-    image: "/Images/62d9c704cc00b906c4fa8834_table top-p-500.jpeg",
+    image:
+      "/Images/Snapinsta.app_327934045_185506027457532_4725250737003749807_n_1080.jpg",
   },
   {
     id: 4,
@@ -30,7 +33,8 @@ export const products = [
     brand: "BOGISICH",
     price: "$60.00 USD",
     category: "Vases",
-    image: "/Images/62d9b9064806cd9c05159d93_circular vase-p-500.jpeg",
+    image:
+      "/Images/Snapinsta.app_477086932_18018479225662369_2870003159432564606_n_1080.jpg",
   },
   {
     id: 5,
@@ -38,7 +42,8 @@ export const products = [
     brand: "BOGISICH",
     price: "$85.00 USD",
     category: "Living Room",
-    image: "/Images/62d9530db9c434b66679b4fc_wooden armchair-p-500.jpeg",
+    image:
+      "/Images/Snapinsta.app_477678603_18018373925662369_7118964616492128982_n_1080.jpg",
   },
   {
     id: 6,
@@ -47,7 +52,8 @@ export const products = [
     price: "$24.00 USD",
     oldPrice: "$36.00 USD",
     category: "Decor",
-    image: "/Images/62d950edc6cef1142023243b_wooden spoons-p-500.jpeg",
+    image:
+      "/Images/Snapinsta.app_480843049_18019429061662369_2067488800883544922_n_1080.jpg",
   },
   {
     id: 7,
@@ -56,7 +62,8 @@ export const products = [
     price: "$105.00 USD",
     oldPrice: "$36.00 USD",
     category: "Decor",
-    image: "/Images/62d7eadd56b8480defcec2f5_relaxing chair-p-500.jpeg",
+    image:
+      "/Images/Snapinsta.app_481041583_18019429052662369_5185370965019674466_n_1080.jpg",
   },
   {
     id: 8,
@@ -65,7 +72,8 @@ export const products = [
     price: "$80.00 USD",
     oldPrice: "$36.00 USD",
     category: "Decor",
-    image: "/Images/62d7e68b4444511c3cf2a617_little shelf-p-500.jpeg",
+    image:
+      "/Images/Snapinsta.app_476124098_18017722634662369_8815390837193244946_n_1080.jpg",
   },
   {
     id: 9,
@@ -74,7 +82,8 @@ export const products = [
     price: "$120.00 USD",
     oldPrice: "$150.00 USD",
     category: "Lighting",
-    image: "/Images/62d7eb51099abe407b4a969d_spherical lamps-p-500.jpeg",
+    image:
+      "/Images/Snapinsta.app_481041583_18019429052662369_5185370965019674466_n_1080.jpg",
   },
   {
     id: 10,
@@ -82,10 +91,105 @@ export const products = [
     brand: "Romguera",
     price: "$32.00 USD",
     category: "Lighting",
-    image: "/Images/62d7e6e1732922084a27d507_open lamp-p-500.jpeg",
+    image:
+      "/Images/Snapinsta.app_479166792_18018748004662369_2837460235763965722_n_1080.jpg",
   },
   {
     id: 11,
+    name: "Fluted Copper Light",
+    brand: "Romguera",
+    price: "$75.00 USD",
+    category: "Lighting",
+    image:
+      "/Images/Snapinsta.app_331793218_5926807807432940_8298766265484724039_n_1080.jpg",
+  },
+  {
+    id: 12,
+    name: "Wall Plant Hanger",
+    brand: "DICKINSON",
+    price: "$34.00 USD",
+    category: "Wall Art",
+    image: "/Images/62e19220374bda5d3584e3f6_wall hanger-p-500.jpeg",
+  },
+  {
+    id: 13,
+    name: "Wooden Vase",
+    brand: "DICKINSON",
+    price: "$240.00 USD",
+    category: "Vases",
+    image: "/Images/62d9c5fd0d2a19b3f6d14b2a_wooden vase-p-500.jpeg",
+  },
+  {
+    id: 14,
+    name: "Wooden Table Top",
+    brand: "ROMGUERA",
+    price: "$54.00 USD",
+    oldPrice: "$54.99 USD",
+    category: "Living Room",
+    image: "/Images/62d9c704cc00b906c4fa8834_table top-p-500.jpeg",
+  },
+  {
+    id: 15,
+    name: "Ceramic Donut Vase",
+    brand: "BOGISICH",
+    price: "$60.00 USD",
+    category: "Vases",
+    image: "/Images/62d9b9064806cd9c05159d93_circular vase-p-500.jpeg",
+  },
+  {
+    id: 16,
+    name: "Wooden Armchair",
+    brand: "BOGISICH",
+    price: "$85.00 USD",
+    category: "Living Room",
+    image: "/Images/62d9530db9c434b66679b4fc_wooden armchair-p-500.jpeg",
+  },
+  {
+    id: 17,
+    name: "Bailey Ceramic Jar",
+    brand: "BRIKUS",
+    price: "$24.00 USD",
+    oldPrice: "$36.00 USD",
+    category: "Decor",
+    image: "/Images/62d950edc6cef1142023243b_wooden spoons-p-500.jpeg",
+  },
+  {
+    id: 18,
+    name: "Comfy Armchair",
+    brand: "BOGISICH",
+    price: "$105.00 USD",
+    oldPrice: "$36.00 USD",
+    category: "Decor",
+    image: "/Images/62d7eadd56b8480defcec2f5_relaxing chair-p-500.jpeg",
+  },
+  {
+    id: 19,
+    name: "Bailey Ceramic Jar",
+    brand: "BOGISICH",
+    price: "$80.00 USD",
+    oldPrice: "$36.00 USD",
+    category: "Decor",
+    image: "/Images/62d7e68b4444511c3cf2a617_little shelf-p-500.jpeg",
+  },
+  {
+    id: 20,
+    name: "Spherical Lamps",
+    brand: "Dickinson",
+    price: "$120.00 USD",
+    oldPrice: "$150.00 USD",
+    category: "Lighting",
+    image: "/Images/62d7eb51099abe407b4a969d_spherical lamps-p-500.jpeg",
+  },
+  {
+    id: 21,
+    name: "Circular Lampshade",
+    brand: "Romguera",
+    price: "$32.00 USD",
+    category: "Lighting",
+    image: "/Images/62d7e6e1732922084a27d507_open lamp-p-500.jpeg",
+  },
+  {
+    id: 22,
     name: "Fluted Copper Light",
     brand: "Romguera",
     price: "$75.00 USD",
