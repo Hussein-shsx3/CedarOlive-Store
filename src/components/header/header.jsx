@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { removeFromCart, clearCart } from "../../redux/cartSlice";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   // Connect to Redux store
   const { cartItems, totalAmount } = useSelector((state) => state.cart);
@@ -26,8 +29,16 @@ const Header = () => {
 
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
-    // Close menu if open
+    // Close other overlays if open
     if (isMenuOpen) setIsMenuOpen(false);
+    if (isSearchOpen) setIsSearchOpen(false);
+  };
+
+  const toggleSearch = () => {
+    setIsSearchOpen(!isSearchOpen);
+    // Close other overlays if open
+    if (isMenuOpen) setIsMenuOpen(false);
+    if (isCartOpen) setIsCartOpen(false);
   };
 
   const handleRemoveItem = (id) => {
@@ -39,8 +50,61 @@ const Header = () => {
     setIsCartOpen(false);
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setIsSearchOpen(false);
+      navigate(`/shop/${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+    }
+  };
+
   return (
     <div className="w-full sticky top-0 z-50">
+      {/* Search Overlay */}
+      <div
+        className={`w-full bg-white shadow-md transition-all duration-300 ease-in-out absolute top-20 left-0 right-0 overflow-hidden ${
+          isSearchOpen ? "max-h-24" : "max-h-0"
+        }`}
+      >
+        <div className="container mx-auto px-4 py-4">
+          <form onSubmit={handleSearch} className="flex items-center">
+            <input
+              type="text"
+              placeholder="Search for products..."
+              className="flex-grow p-2 border border-gray-300 focus:outline-none focus:border-secondary"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              autoFocus={isSearchOpen}
+            />
+            <button
+              type="submit"
+              className="bg-secondary text-white px-6 py-2 ml-2 hover:bg-[#aa7b5a] transition duration-200"
+            >
+              Search
+            </button>
+            <button
+              type="button"
+              className="ml-2 p-2 text-gray-500 hover:text-black"
+              onClick={toggleSearch}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
+
       <header className="w-full bg-background shadow-sm py-4">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
@@ -73,7 +137,10 @@ const Header = () => {
               ))}
             </nav>
             <div className="flex items-center space-x-4">
-              <button className="p-1 hover:text-secondary transition duration-200">
+              <button
+                className="p-1 hover:text-secondary transition duration-200"
+                onClick={toggleSearch}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
@@ -166,12 +233,12 @@ const Header = () => {
                             <div className="w-20 h-24 flex-shrink-0 mr-4">
                               <img
                                 src={item.image || "/api/placeholder/80/96"}
-                                alt={item.title}
+                                alt={item.name}
                                 className="w-full h-full object-cover"
                               />
                             </div>
                             <div className="flex-grow">
-                              <h4 className="font-medium">{item.title}</h4>
+                              <h4 className="font-medium">{item.name}</h4>
                               <div className="flex justify-between items-center mt-2">
                                 <p className="text-gray-900">{item.price}</p>
                                 <div className="flex items-center">
@@ -220,7 +287,10 @@ const Header = () => {
               </div>
               <button
                 className="md:hidden p-1 hover:text-gray-600 transition duration-200"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                onClick={() => {
+                  setIsMenuOpen(!isMenuOpen);
+                  if (isSearchOpen) setIsSearchOpen(false);
+                }}
                 aria-label={isMenuOpen ? "Close menu" : "Open menu"}
               >
                 <svg

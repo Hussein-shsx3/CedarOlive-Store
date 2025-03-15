@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../redux/cartSlice"; // Import Redux action
 import Header from "../components/header/header";
 import Footer from "../components/footer/footer";
 import Explore from "../components/productPage/explore";
@@ -10,20 +12,42 @@ const Product = () => {
   const [quantity, setQuantity] = useState(1);
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch(); // Initialize Redux dispatch
   const [product, setProduct] = useState(null);
+  const [showToast, setShowToast] = useState(false);
+  const [toastAnimation, setToastAnimation] = useState("slide-in");
 
   useEffect(() => {
-    // Find product by ID from URL params
     const productId = parseInt(id);
     const foundProduct = products.find((p) => p.id === productId);
 
     if (foundProduct) {
       setProduct(foundProduct);
     } else {
-      // Redirect to products page if product not found
       navigate("/shop");
     }
   }, [id, navigate]);
+
+  // Effect to handle toast animation and timing
+  useEffect(() => {
+    if (showToast) {
+      // Set timer to start exit animation
+      const exitTimer = setTimeout(() => {
+        setToastAnimation("slide-out");
+      }, 2500);
+
+      // Set timer to hide toast after animation completes
+      const hideTimer = setTimeout(() => {
+        setShowToast(false);
+        setToastAnimation("slide-in"); // Reset animation for next time
+      }, 3000);
+
+      return () => {
+        clearTimeout(exitTimer);
+        clearTimeout(hideTimer);
+      };
+    }
+  }, [showToast]);
 
   if (!product) {
     return (
@@ -34,16 +58,85 @@ const Product = () => {
     );
   }
 
-  // Get category for breadcrumb
-  const category = product.category;
+  const handleAddToCart = () => {
+    const productToAdd = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity,
+    };
+    dispatch(addToCart(productToAdd)); // Dispatch action to add product to cart
+    setToastAnimation("slide-in"); // Ensure animation starts from beginning
+    setShowToast(true); // Show toast notification
+  };
 
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex flex-col justify-center items-center relative">
       <ScrollToTop />
       <Header />
+
+      {/* Toast notification with animation */}
+      <style jsx>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes slideOut {
+          from {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          to {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+        }
+
+        .slide-in {
+          animation: slideIn 0.3s ease forwards;
+        }
+
+        .slide-out {
+          animation: slideOut 0.3s ease forwards;
+        }
+
+        .toast-shadow {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+      `}</style>
+
+      {showToast && (
+        <div
+          className={`fixed top-20 right-4 bg-green-500 text-white px-6 py-3 rounded z-50 flex items-center toast-shadow ${toastAnimation}`}
+        >
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          <span>{product.name} added to cart successfully!</span>
+        </div>
+      )}
+
       <section className="container mx-auto px-6 py-4 my-10">
         <div className="grid grid-cols-1 md:grid-cols-10 gap-16">
-          {/* Product Image */}
           <div className="md:col-span-5">
             <img
               src={product.image}
@@ -52,11 +145,10 @@ const Product = () => {
             />
           </div>
 
-          {/* Product Details */}
           <div className="md:col-span-4">
             <div className="text-sm mb-6">
               <span className="text-gray-500">Shop</span> /{" "}
-              <span className="text-gray-500">{category}</span>
+              <span className="text-gray-500">{product.category}</span>
             </div>
             <h1 className="text-3xl font-medium mb-1">{product.name}</h1>
             <div className="text-gray-500 uppercase mb-4">{product.brand}</div>
@@ -81,50 +173,18 @@ const Product = () => {
                     className="border px-2 py-2 w-16"
                   />
                 </div>
-                <button className="bg-primary text-black px-6 py-4 hover:bg-gray-200">
+                <button
+                  className="bg-primary text-black px-6 py-4 hover:bg-gray-200"
+                  onClick={handleAddToCart}
+                >
                   Add to Bag
                 </button>
               </div>
             </div>
             <hr />
-            <div className="my-6">
-              <h2 className="font-semibold mb-2">Highlights</h2>
-              <p className="text-sm">
-                Materials: acrylic paint, paint, plywood, wood glue, glue, metal
-                hanging kit, upcycled wood scraps, metal hanging system, nails,
-                reclaimed wood, wood, construction adhesive.
-              </p>
-            </div>
-
-            <div className="mb-6">
-              <h2 className="font-semibold mb-2">Dimensions:</h2>
-              <div className="text-sm">
-                <div>Height: 30 inches</div>
-                <div>Width: 60 inches</div>
-                <div>Depth: 1.5 inches</div>
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <h2 className="font-semibold mb-2">Description</h2>
-              <p className="text-sm">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat.
-              </p>
-            </div>
-
-            <div className="mb-6">
-              <h2 className="font-semibold mb-2">Shipping Info</h2>
-              <p className="text-sm">
-                Duis aute irure dolor in reprehenderit in voluptate velit esse
-                cillum dolore.
-              </p>
-            </div>
           </div>
         </div>
-        <Explore category={category} />
+        <Explore category={product.category} />
       </section>
       <Footer />
     </div>
