@@ -26,7 +26,7 @@ const Section5 = () => {
         {/* Right - Main Image */}
         <div className="w-full md:w-[69%] h-48 sm:h-64 md:h-full">
           <img
-            src="/Images/Screenshot 2025-03-09 143420.png"
+            src="/Images/63f5cf9cef5fdf054c8af861_collections banner.jpg"
             alt="Living Room Decor"
             className="w-full h-full object-cover"
             loading="lazy"

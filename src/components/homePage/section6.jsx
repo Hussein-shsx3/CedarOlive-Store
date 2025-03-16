@@ -7,7 +7,7 @@ const Section6 = () => {
       <div className="flex flex-col md:flex-row bg-[#513015] justify-start md:justify-center items-stretch overflow-hidden h-auto min-h-[400px] md:h-[670px]">
         <div className="w-full md:w-[69%] h-48 sm:h-64 md:h-full">
           <img
-            src="/Images/Screenshot 2025-03-09 143327.png"
+            src="/Images/63f5dc1ad2ca79cd5062cf23_about banner.jpg"
             alt="Living Room Decor"
             className="w-full h-full object-cover"
             loading="lazy"
