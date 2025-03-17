@@ -4,6 +4,8 @@ import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import Product from "./pages/Product";
 import About from "./pages/About";
+import SignUp from "./pages/SignUp";
+import SignIn from "./pages/SignIn";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import PrivateRoute from "./components/Protected/PrivateRoute";
@@ -12,6 +14,14 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
+  },
+  {
+    path: "/signIn",
+    element: <SignIn />,
+  },
+  {
+    path: "/signUp",
+    element: <SignUp />,
   },
   {
     path: "/about",

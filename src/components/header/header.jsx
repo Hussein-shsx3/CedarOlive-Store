@@ -7,12 +7,20 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   // Connect to Redux store
   const { cartItems, totalAmount } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
+
+  // Assuming user data would come from Redux, we can mock it for now
+  const user = {
+    name: "John Doe",
+    email: "john.doe@example.com",
+    avatar: "/api/placeholder/32/32", // Placeholder for user avatar
+  };
 
   const navLinks = [
     { title: "About", path: "/about" },
@@ -27,11 +35,19 @@ const Header = () => {
     { title: "Lighting", path: "/shop/Lighting" },
   ];
 
+  const profileLinks = [
+    { title: "My Account", path: "/account" },
+    { title: "My Orders", path: "/account/orders" },
+    { title: "Wishlist", path: "/account/wishlist" },
+    { title: "Settings", path: "/account/settings" },
+  ];
+
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
     // Close other overlays if open
     if (isMenuOpen) setIsMenuOpen(false);
     if (isSearchOpen) setIsSearchOpen(false);
+    if (isProfileOpen) setIsProfileOpen(false);
   };
 
   const toggleSearch = () => {
@@ -39,6 +55,15 @@ const Header = () => {
     // Close other overlays if open
     if (isMenuOpen) setIsMenuOpen(false);
     if (isCartOpen) setIsCartOpen(false);
+    if (isProfileOpen) setIsProfileOpen(false);
+  };
+
+  const toggleProfile = () => {
+    setIsProfileOpen(!isProfileOpen);
+    // Close other overlays if open
+    if (isMenuOpen) setIsMenuOpen(false);
+    if (isCartOpen) setIsCartOpen(false);
+    if (isSearchOpen) setIsSearchOpen(false);
   };
 
   const handleRemoveItem = (id) => {
@@ -57,6 +82,13 @@ const Header = () => {
       navigate(`/shop/${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
     }
+  };
+
+  const handleLogout = () => {
+    // Here you would implement logout logic
+    // For example: dispatch(logout());
+    setIsProfileOpen(false);
+    navigate("/signIn");
   };
 
   return (
@@ -156,9 +188,68 @@ const Header = () => {
                   />
                 </svg>
               </button>
-              <button className="hidden md:block text-[15px] bg-primary px-6 py-3 text-title hover:text-white hover:bg-secondary transition duration-200">
-                Purchase
-              </button>
+
+              {/* User Profile */}
+              <div className="relative">
+                {!user ? (
+                  <>
+                    <button
+                      className="flex items-center hover:text-secondary transition duration-200"
+                      onClick={toggleProfile}
+                    >
+                      <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                        <img
+                          src={user.avatar}
+                          alt="User"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </button>
+
+                    {/* Profile Dropdown */}
+                    <div
+                      className={`absolute right-0 w-56 mt-2 bg-white rounded-md shadow-lg z-50 transition-all duration-200 ease-in-out ${
+                        isProfileOpen
+                          ? "opacity-100 scale-100"
+                          : "opacity-0 scale-95 pointer-events-none"
+                      }`}
+                    >
+                      <div className="p-3 border-b">
+                        <p className="font-medium">{user.firstName} {user.lastName}</p>
+                        <p className="text-sm text-gray-500">{user.email}</p>
+                      </div>
+                      <div className="py-1">
+                        {profileLinks.map((link) => (
+                          <Link
+                            key={link.title}
+                            to={link.path}
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() => setIsProfileOpen(false)}
+                          >
+                            {link.title}
+                          </Link>
+                        ))}
+                      </div>
+                      <div className="py-1 border-t">
+                        <button
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={handleLogout}
+                        >
+                          Log Out
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <Link
+                    to="/signIn"
+                    className="px-4 py-2 bg-secondary text-white rounded hover:bg-[#aa7b5a] transition duration-200"
+                  >
+                    Sign In
+                  </Link>
+                )}
+              </div>
+
               <div className="relative">
                 <button
                   className="p-1 hover:text-secondary transition duration-200"
