@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { signIn } from "../api/authApi";
+import { signIn } from "../../api/authApi";
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
@@ -87,7 +87,7 @@ const SignIn = () => {
                 className="w-32"
               />
             </Link>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            <h2 className="mt-6 text-center text-3xl font-medium text-gray-700">
               Sign in to your account
             </h2>
           </div>

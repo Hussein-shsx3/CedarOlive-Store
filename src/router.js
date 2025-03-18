@@ -4,11 +4,13 @@ import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import Product from "./pages/Product";
 import About from "./pages/About";
-import SignUp from "./pages/SignUp";
-import SignIn from "./pages/SignIn";
+import SignUp from "./pages/authPages/SignUp";
+import SignIn from "./pages/authPages/SignIn";
 import AdminDashboard from "./pages/AdminDashboard";
-import EmailVerificationPage from "./pages/EmailVerificationPage";
-import ResendVerification from "./pages/ResendVerification";
+import EmailVerificationPage from "./pages/authPages/EmailVerificationPage";
+import ResendVerification from "./pages/authPages/ResendVerification";
+import ForgotPassword from "./pages/authPages/ForgotPassword";
+import ResetPassword from "./pages/authPages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import PrivateRoute from "./components/Protected/PrivateRoute";
 
@@ -52,6 +54,14 @@ const router = createBrowserRouter([
   {
     path: "/resend-verification",
     element: <ResendVerification />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/reset-password/:token",
+    element: <ResetPassword />,
   },
   {
     path: "*",

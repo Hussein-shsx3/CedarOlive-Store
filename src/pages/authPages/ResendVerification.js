@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
-import { resendVerification } from "../api/authApi";
+import { resendVerification } from "../../api/authApi";
 
 const ResendVerification = () => {
   const [email, setEmail] = useState("");

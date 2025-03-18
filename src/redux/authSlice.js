@@ -4,6 +4,8 @@ import {
   signIn,
   verifyEmail,
   resendVerification,
+  forgotPassword,
+  resetPassword,
 } from "../api/authApi";
 import Cookies from "universal-cookie";
 
@@ -15,8 +17,10 @@ const initialState = {
   loading: false,
   error: null,
   emailVerified: false,
-  resendSuccess: false, // Track resend verification success status
-  resendError: null, // Track any error during resend verification
+  resendSuccess: false, 
+  resendError: null, 
+  forgotPasswordSuccess: false, 
+  resetPasswordSuccess: false, 
 };
 
 const authSlice = createSlice({
@@ -91,14 +95,47 @@ const authSlice = createSlice({
       })
       .addCase(resendVerification.fulfilled, (state) => {
         state.loading = false;
-        state.resendSuccess = true; // Mark as successful resend
-        state.resendError = null; // Clear any previous errors
+        state.resendSuccess = true;
+        state.resendError = null;
       })
       .addCase(resendVerification.rejected, (state, action) => {
         state.loading = false;
-        state.resendSuccess = false; // Mark resend as failed
+        state.resendSuccess = false;
         state.resendError =
           action.payload?.message || "Resend verification failed";
+      })
+
+      // ✅ Forgot Password cases
+      .addCase(forgotPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.forgotPasswordSuccess = false;
+      })
+      .addCase(forgotPassword.fulfilled, (state) => {
+        state.loading = false;
+        state.forgotPasswordSuccess = true;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.forgotPasswordSuccess = false;
+        state.error =
+          action.payload?.message || "Forgot password request failed";
+      })
+
+      // ✅ Reset Password cases
+      .addCase(resetPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.resetPasswordSuccess = false;
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.loading = false;
+        state.resetPasswordSuccess = true;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.resetPasswordSuccess = false;
+        state.error = action.payload?.message || "Reset password failed";
       });
   },
 });
