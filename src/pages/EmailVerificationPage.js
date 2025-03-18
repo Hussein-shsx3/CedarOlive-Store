@@ -1,127 +1,117 @@
-import React, { useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+// EmailVerificationPage.jsx
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { verifyEmail } from "../api/verifyApi";
-import { resetVerification } from "../redux/verifySlice";
 
 const EmailVerificationPage = () => {
-  const { userId } = useParams();
   const dispatch = useDispatch();
+  const { userId } = useParams();
+  const isVerifying = useSelector((state) => state.verify?.isVerifying);
+  const isVerified = useSelector((state) => state.verify?.isVerified);
+  const error = useSelector((state) => state.verify?.error);
+  console.log(isVerified);
 
-  // Get verification state from Redux
-  const { isVerified, loading, error } = useSelector((state) => state.verify);
-
-  useEffect(() => {
+  const handleVerify = () => {
     if (userId) {
       dispatch(verifyEmail(userId));
     }
-
-    return () => {
-      dispatch(resetVerification());
-    };
-  }, [dispatch, userId]);
-
-  // Render UI based on verification state
-  const renderContent = () => {
-    if (loading) {
-      return (
-        <div className="flex flex-col items-center">
-          <div className="w-16 h-16 border-4 border-[#a87048] border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-[#8a8888]">Verifying your email...</p>
-        </div>
-      );
-    }
-
-    if (isVerified) {
-      return (
-        <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-[#ede5de] rounded-full flex items-center justify-center mb-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 text-[#a87048]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <h3 className="text-xl font-bold text-[#131313] mb-2">
-            Email Verified!
-          </h3>
-          <p className="text-[#8a8888] mb-6 text-center">
-            Your email has been successfully verified. You can now access all
-            features of your account.
-          </p>
-          <Link
-            to="/login"
-            className="py-2 px-6 bg-[#a87048] text-white rounded-lg hover:bg-opacity-90 transition-all"
-          >
-            Log In
-          </Link>
-        </div>
-      );
-    }
-
-    return (
-      <div className="flex flex-col items-center">
-        <div className="w-16 h-16 bg-[#ede5de] rounded-full flex items-center justify-center mb-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-10 w-10 text-red-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </div>
-        <h3 className="text-xl font-bold text-[#131313] mb-2">
-          Verification Failed
-        </h3>
-        <p className="text-[#8a8888] mb-2 text-center">
-          {error || "An error occurred during verification."}
-        </p>
-        <p className="text-[#8a8888] mb-6 text-center">
-          Please try again or contact our support team for assistance.
-        </p>
-        <div className="flex gap-4">
-          <button
-            onClick={() => dispatch(verifyEmail(userId))}
-            className="py-2 px-6 bg-[#ede5de] text-[#a87048] rounded-lg hover:bg-opacity-90 transition-all"
-          >
-            Try Again
-          </button>
-          <Link
-            to="/contact"
-            className="py-2 px-6 bg-[#a87048] text-white rounded-lg hover:bg-opacity-90 transition-all"
-          >
-            Contact Support
-          </Link>
-        </div>
-      </div>
-    );
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f7f3f3] px-4 py-12">
-      <div className="bg-white rounded-xl shadow-md p-8 w-full max-w-md">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-[#131313]">
-            Email Verification
-          </h2>
+    <div className="min-h-screen flex items-center justify-center bg-[#f7f3f3]">
+      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 m-4">
+        <h1 className="text-2xl font-bold mb-6 text-center text-[#131313]">
+          Email Verification
+        </h1>
+
+        <div className="mb-6 text-center">
+          {!isVerified ? (
+            <p className="text-[#8a8888] mb-6">
+              Please click the button below to verify your email address and
+              activate your account.
+            </p>
+          ) : (
+            <p className="text-[#8a8888] mb-6">
+              Your email has been successfully verified. You can now log in to
+              your account.
+            </p>
+          )}
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
+
+          {!isVerified && (
+            <button
+              onClick={handleVerify}
+              disabled={isVerifying}
+              className="w-full py-3 px-4 rounded-md bg-[#a87048] hover:bg-[#8a5c3d] text-white font-medium transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isVerifying ? (
+                <div className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin h-5 w-5 mr-3 text-white"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Verifying...
+                </div>
+              ) : (
+                "Verify Email"
+              )}
+            </button>
+          )}
+
+          {isVerified && (
+            <div className="flex items-center justify-center text-[#a87048] mb-4">
+              <svg
+                className="w-6 h-6 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 13l4 4L19 7"
+                ></path>
+              </svg>
+              <span>Email verified successfully!</span>
+            </div>
+          )}
         </div>
-        {renderContent()}
+
+        <div className="text-center mt-6">
+          <p className="text-sm text-[#8a8888]">
+            If you're having trouble verifying your email, please contact our
+            support team.
+          </p>
+          <div className="mt-4 p-4 bg-[#ede5de] rounded-md border border-[#e2e8f0]">
+            <p className="text-sm text-[#8a8888]">
+              <span className="font-medium">Note:</span> This verification link
+              will expire in 24 hours.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
