@@ -2,19 +2,22 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { verifyEmail } from "../api/verifyApi";
+import { verifyEmail } from "../api/authApi";
 
 const EmailVerificationPage = () => {
   const dispatch = useDispatch();
-  const { userId } = useParams();
-  const isVerifying = useSelector((state) => state.verify?.isVerifying);
-  const isVerified = useSelector((state) => state.verify?.isVerified);
-  const error = useSelector((state) => state.verify?.error);
-  console.log(isVerified);
+  const { token } = useParams();
+
+  // Update these selectors to point to the auth slice
+  const loading = useSelector((state) => state.auth.loading);
+  const emailVerified = useSelector((state) => state.auth.emailVerified);
+  const error = useSelector((state) => state.auth.error);
+
+  console.log("Email verified:", emailVerified);
 
   const handleVerify = () => {
-    if (userId) {
-      dispatch(verifyEmail(userId));
+    if (token) {
+      dispatch(verifyEmail(token));
     }
   };
 
@@ -26,7 +29,7 @@ const EmailVerificationPage = () => {
         </h1>
 
         <div className="mb-6 text-center">
-          {!isVerified ? (
+          {!emailVerified ? (
             <p className="text-[#8a8888] mb-6">
               Please click the button below to verify your email address and
               activate your account.
@@ -44,13 +47,13 @@ const EmailVerificationPage = () => {
             </div>
           )}
 
-          {!isVerified && (
+          {!emailVerified && (
             <button
               onClick={handleVerify}
-              disabled={isVerifying}
+              disabled={loading}
               className="w-full py-3 px-4 rounded-md bg-[#a87048] hover:bg-[#8a5c3d] text-white font-medium transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isVerifying ? (
+              {loading ? (
                 <div className="flex items-center justify-center">
                   <svg
                     className="animate-spin h-5 w-5 mr-3 text-white"
@@ -79,7 +82,7 @@ const EmailVerificationPage = () => {
             </button>
           )}
 
-          {isVerified && (
+          {emailVerified && (
             <div className="flex items-center justify-center text-[#a87048] mb-4">
               <svg
                 className="w-6 h-6 mr-2"

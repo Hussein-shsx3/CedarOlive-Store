@@ -8,6 +8,7 @@ import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import AdminDashboard from "./pages/AdminDashboard";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
+import ResendVerification from "./pages/ResendVerification";
 import NotFound from "./pages/NotFound";
 import PrivateRoute from "./components/Protected/PrivateRoute";
 
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
   {
     path: "/verify/:userId",
     element: <EmailVerificationPage />,
+  },
+  {
+    path: "/resend-verification",
+    element: <ResendVerification />,
   },
   {
     path: "*",

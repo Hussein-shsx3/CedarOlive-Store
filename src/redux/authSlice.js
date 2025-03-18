@@ -1,5 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { signUp, signIn } from "../api/authApi";
+import {
+  signUp,
+  signIn,
+  verifyEmail,
+  resendVerification,
+} from "../api/authApi";
 import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
@@ -9,6 +14,9 @@ const initialState = {
   token: cookies.get("token") || null,
   loading: false,
   error: null,
+  emailVerified: false,
+  resendSuccess: false, // Track resend verification success status
+  resendError: null, // Track any error during resend verification
 };
 
 const authSlice = createSlice({
@@ -19,6 +27,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       cookies.remove("token", { path: "/" });
+      state.emailVerified = false;
     },
   },
   extraReducers: (builder) => {
@@ -58,6 +67,38 @@ const authSlice = createSlice({
       .addCase(signIn.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || "Sign-in failed";
+      })
+
+      // Email verification cases
+      .addCase(verifyEmail.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyEmail.fulfilled, (state) => {
+        state.loading = false;
+        state.emailVerified = true;
+      })
+      .addCase(verifyEmail.rejected, (state, action) => {
+        state.loading = false;
+        state.emailVerified = false;
+        state.error = action.payload?.message || "Email verification failed";
+      })
+
+      // Resend verification cases
+      .addCase(resendVerification.pending, (state) => {
+        state.loading = true;
+        state.resendError = null;
+      })
+      .addCase(resendVerification.fulfilled, (state) => {
+        state.loading = false;
+        state.resendSuccess = true; // Mark as successful resend
+        state.resendError = null; // Clear any previous errors
+      })
+      .addCase(resendVerification.rejected, (state, action) => {
+        state.loading = false;
+        state.resendSuccess = false; // Mark resend as failed
+        state.resendError =
+          action.payload?.message || "Resend verification failed";
       });
   },
 });
