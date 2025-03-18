@@ -1,0 +1,39 @@
+import { createSlice } from "@reduxjs/toolkit";
+import { verifyEmail } from "../api/verifyApi";
+
+const initialState = {
+  isVerified: false,
+  loading: false,
+  error: null,
+};
+
+const verifySlice = createSlice({
+  name: "verify",
+  initialState,
+  reducers: {
+    resetVerification: (state) => {
+      state.isVerified = false;
+      state.loading = false;
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(verifyEmail.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyEmail.fulfilled, (state) => {
+        state.loading = false;
+        state.isVerified = true;
+      })
+      .addCase(verifyEmail.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message || "Email verification failed";
+      });
+  },
+});
+
+// ✅ Correctly export actions and reducer
+export const { resetVerification } = verifySlice.actions;
+export default verifySlice.reducer;

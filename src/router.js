@@ -7,6 +7,7 @@ import About from "./pages/About";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import AdminDashboard from "./pages/AdminDashboard";
+import EmailVerificationPage from "./pages/EmailVerificationPage";
 import NotFound from "./pages/NotFound";
 import PrivateRoute from "./components/Protected/PrivateRoute";
 
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
         <AdminDashboard />
       </PrivateRoute>
     ),
+  },
+  {
+    path: "/verify/:userId",
+    element: <EmailVerificationPage />,
   },
   {
     path: "*",

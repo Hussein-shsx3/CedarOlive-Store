@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// Function to calculate total price
 const calculateTotal = (cartItems) => {
   return cartItems.reduce(
     (total, item) =>
@@ -9,14 +8,13 @@ const calculateTotal = (cartItems) => {
   );
 };
 
-// Load cart from localStorage
 const loadCartFromLocalStorage = () => {
   const data = localStorage.getItem("cart");
   if (!data) return { cartItems: [], totalAmount: 0 };
 
   const { cartItems = [], timestamp } = JSON.parse(data);
 
-  const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+  const oneHour = 60 * 60 * 1000; 
   if (Date.now() - timestamp > oneHour) {
     localStorage.removeItem("cart");
     return { cartItems: [], totalAmount: 0 };
@@ -25,7 +23,6 @@ const loadCartFromLocalStorage = () => {
   return { cartItems, totalAmount: calculateTotal(cartItems) };
 };
 
-// Save cart to localStorage
 const saveCartToLocalStorage = (cartItems, totalAmount) => {
   const data = { cartItems, totalAmount, timestamp: Date.now() };
   localStorage.setItem("cart", JSON.stringify(data));
@@ -42,10 +39,8 @@ const cartSlice = createSlice({
       const existingItem = state.cartItems.find((item) => item.id === id);
 
       if (existingItem) {
-        // Update quantity if item exists
         existingItem.quantity += quantity;
       } else {
-        // Add new item
         state.cartItems.push({ ...action.payload });
       }
 

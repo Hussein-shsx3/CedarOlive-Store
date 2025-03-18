@@ -4,7 +4,7 @@ import { AlertTriangle, Home } from "lucide-react";
 
 const NotFound = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-primary flex items-center justify-center p-4">
       <div className="bg-white shadow-2xl rounded-2xl p-8 md:p-12 text-center max-w-md w-full">
         <div className="flex justify-center mb-6">
           <AlertTriangle size={100} className="text-red-500 animate-bounce" />
@@ -23,7 +23,7 @@ const NotFound = () => {
 
         <Link
           to="/"
-          className="inline-flex items-center bg-blue-500 text-white px-6 py-3 rounded-full hover:bg-blue-600 transition-colors duration-300 shadow-md"
+          className="inline-flex items-center bg-secondary text-white px-6 py-3 rounded-full hover:bg-[#c1855a] transition-colors duration-300 shadow-md"
         >
           <Home className="mr-2" size={20} />
           Return Home
