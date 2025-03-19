@@ -95,7 +95,7 @@ const Header = () => {
     <div className="w-full sticky top-0 z-50">
       {/* Search Overlay */}
       <div
-        className={`w-full bg-white shadow-md transition-all duration-300 ease-in-out absolute top-20 left-0 right-0 overflow-hidden ${
+        className={`w-full bg-white shadow-md transition-all duration-300 ease-in-out absolute top-16 left-0 right-0 overflow-hidden ${
           isSearchOpen ? "max-h-24" : "max-h-0"
         }`}
       >

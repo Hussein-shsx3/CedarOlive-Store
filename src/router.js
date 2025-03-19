@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import Product from "./pages/Product";
 import About from "./pages/About";
+import Blog from "./pages/Blog";
 import SignUp from "./pages/authPages/SignUp";
 import SignIn from "./pages/authPages/SignIn";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
     element: <About />,
   },
   {
+    path: "/blog",
+    element: <Blog />,
+  },
+  {
     path: "/product/:id",
     element: <Product />,
   },
@@ -48,7 +53,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/verify/:userId",
+    path: "/verify/:token",
     element: <EmailVerificationPage />,
   },
   {
@@ -60,7 +65,7 @@ const router = createBrowserRouter([
     element: <ForgotPassword />,
   },
   {
-    path: "/reset-password/:token",
+    path: "/resetPassword/:token",
     element: <ResetPassword />,
   },
   {

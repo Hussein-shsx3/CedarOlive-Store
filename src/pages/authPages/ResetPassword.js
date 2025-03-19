@@ -19,7 +19,7 @@ const ResetPassword = () => {
 
   useEffect(() => {
     if (resetPasswordSuccess) {
-      const timer = setTimeout(() => navigate("/login"), 3000);
+      const timer = setTimeout(() => navigate("/signIn"), 3000);
       return () => clearTimeout(timer);
     }
   }, [resetPasswordSuccess, navigate]);

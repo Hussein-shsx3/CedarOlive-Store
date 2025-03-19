@@ -14,7 +14,7 @@ const ForgotPassword = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await dispatch(forgotPassword({ email }));
+      dispatch(forgotPassword({ email }));
     } finally {
       setIsSubmitting(false);
     }
