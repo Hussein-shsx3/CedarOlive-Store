@@ -10,11 +10,10 @@ const SignUp = () => {
 
   // Manage local form state
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    name: "", // Changed from firstName/lastName to single name field
     email: "",
     password: "",
-    confirmPassword: "",
+    passwordConfirm: "", // Changed from confirmPassword to passwordConfirm
     phone: "",
     address: "",
   });
@@ -92,12 +91,12 @@ const SignUp = () => {
     let newErrors = {};
 
     // Validate required fields
-    if (!formData.firstName.trim())
-      newErrors.firstName = "First name is required";
-    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
-    if (!formData.email.trim()) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email))
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Please enter a valid email address";
+    }
 
     // Password validation
     if (!formData.password) {
@@ -109,8 +108,8 @@ const SignUp = () => {
     }
 
     // Confirm password
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
+    if (formData.password !== formData.passwordConfirm) {
+      newErrors.passwordConfirm = "Passwords do not match";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -118,12 +117,12 @@ const SignUp = () => {
       return;
     }
 
-    // Build the payload
+    // Build the payload according to backend expectations
     const payload = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
+      name: formData.name,
       email: formData.email,
       password: formData.password,
+      passwordConfirm: formData.passwordConfirm,
       phone: formData.phone,
       address: formData.address,
     };
@@ -131,7 +130,19 @@ const SignUp = () => {
     setIsSubmitting(true);
     try {
       await dispatch(signUp(payload)).unwrap();
-      // Redirect logic would go here after successful sign-up.
+      // After successful signup, show verification message
+      setErrors({
+        form: "Verification email sent! Please check your inbox.",
+      });
+      // Clear form
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        passwordConfirm: "",
+        phone: "",
+        address: "",
+      });
     } catch (error) {
       console.error("Error during sign-up:", error);
       setErrors({
@@ -145,12 +156,8 @@ const SignUp = () => {
   };
 
   return (
-    <div
-      className="flex justify-center items-center min-h-screen px-4 py-8 bg-background"
-    >
-      <div
-        className="rounded-xl shadow-lg p-8 w-full max-w-2xl bg-white"
-      >
+    <div className="flex justify-center items-center min-h-screen px-4 py-8 bg-background">
+      <div className="rounded-xl shadow-lg p-8 w-full max-w-2xl bg-white">
         <div className="sm:mx-auto sm:w-full sm:max-w-md mb-9">
           <Link to="/" className="flex justify-center">
             <img
@@ -180,68 +187,35 @@ const SignUp = () => {
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label
-                htmlFor="firstName"
-                className="block mb-2 text-sm font-medium"
-                style={{ color: "var(--color-title, #131313)" }}
-              >
-                First Name *
-              </label>
-              <input
-                type="text"
-                id="firstName"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                disabled={isSubmitting}
-                className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all`}
-                style={{
-                  color: "var(--color-title, #131313)",
-                  backgroundColor: "rgba(255, 255, 255, 0.7)",
-                  borderColor: errors.firstName
-                    ? "#ef4444"
-                    : "var(--color-border, #e2e8f0)",
-                  borderWidth: "1px",
-                  "--tw-ring-color": "var(--color-secondary, #a87048)",
-                }}
-              />
-              {errors.firstName && (
-                <p className="mt-1 text-sm text-red-500">{errors.firstName}</p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="lastName"
-                className="block mb-2 text-sm font-medium"
-                style={{ color: "var(--color-title, #131313)" }}
-              >
-                Last Name *
-              </label>
-              <input
-                type="text"
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                disabled={isSubmitting}
-                className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all`}
-                style={{
-                  color: "var(--color-title, #131313)",
-                  backgroundColor: "rgba(255, 255, 255, 0.7)",
-                  borderColor: errors.lastName
-                    ? "#ef4444"
-                    : "var(--color-border, #e2e8f0)",
-                  borderWidth: "1px",
-                  "--tw-ring-color": "var(--color-secondary, #a87048)",
-                }}
-              />
-              {errors.lastName && (
-                <p className="mt-1 text-sm text-red-500">{errors.lastName}</p>
-              )}
-            </div>
+          <div className="mb-4">
+            <label
+              htmlFor="name"
+              className="block mb-2 text-sm font-medium"
+              style={{ color: "var(--color-title, #131313)" }}
+            >
+              Full Name *
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              disabled={isSubmitting}
+              className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all`}
+              style={{
+                color: "var(--color-title, #131313)",
+                backgroundColor: "rgba(255, 255, 255, 0.7)",
+                borderColor: errors.name
+                  ? "#ef4444"
+                  : "var(--color-border, #e2e8f0)",
+                borderWidth: "1px",
+                "--tw-ring-color": "var(--color-secondary, #a87048)",
+              }}
+            />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+            )}
           </div>
 
           <div className="mb-4">
@@ -366,7 +340,7 @@ const SignUp = () => {
 
           <div className="mb-4">
             <label
-              htmlFor="confirmPassword"
+              htmlFor="passwordConfirm"
               className="block mb-2 text-sm font-medium"
               style={{ color: "var(--color-title, #131313)" }}
             >
@@ -374,25 +348,25 @@ const SignUp = () => {
             </label>
             <input
               type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
+              id="passwordConfirm"
+              name="passwordConfirm"
+              value={formData.passwordConfirm}
               onChange={handleChange}
               disabled={isSubmitting}
               className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all`}
               style={{
                 color: "var(--color-title, #131313)",
                 backgroundColor: "rgba(255, 255, 255, 0.7)",
-                borderColor: errors.confirmPassword
+                borderColor: errors.passwordConfirm
                   ? "#ef4444"
                   : "var(--color-border, #e2e8f0)",
                 borderWidth: "1px",
                 "--tw-ring-color": "var(--color-secondary, #a87048)",
               }}
             />
-            {errors.confirmPassword && (
+            {errors.passwordConfirm && (
               <p className="mt-1 text-sm text-red-500">
-                {errors.confirmPassword}
+                {errors.passwordConfirm}
               </p>
             )}
           </div>
