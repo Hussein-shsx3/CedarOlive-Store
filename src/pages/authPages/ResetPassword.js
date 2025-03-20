@@ -286,6 +286,12 @@ const ResetPassword = () => {
                   "Update Password"
                 )}
               </button>
+              <div className="mt-4 p-4 bg-[#ede5de] rounded-md border border-[#e2e8f0]">
+                <p className="text-sm text-[#8a8888]">
+                  <span className="font-medium">Note:</span> This reset password
+                  link will expire in 10 minu.
+                </p>
+              </div>
             </form>
           </>
         )}
