@@ -4,7 +4,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const apiClient = axios.create({
-  baseURL: `${API_BASE_URL}/api/v1/users`, // Base URL for all user-related endpoints
+  baseURL: `${API_BASE_URL}/api/v1/users`,
   headers: {
     "Content-Type": "application/json",
   },
@@ -55,8 +55,8 @@ export const verifyEmail = createAsyncThunk(
   "auth/verifyEmail",
   async (token, { rejectWithValue }) => {
     try {
-      const response = await apiPost(`/verify/${token}`);
-      return response;
+      const response = await apiClient.patch(`/verify/${token}`);
+      return response.data;
     } catch (error) {
       const message = extractErrorMessage(error, "Email verification failed");
       return rejectWithValue({ message });

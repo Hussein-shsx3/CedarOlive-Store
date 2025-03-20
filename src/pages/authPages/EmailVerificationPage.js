@@ -1,12 +1,12 @@
-// EmailVerificationPage.jsx
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { verifyEmail } from "../../api/authApi";
 
 const EmailVerificationPage = () => {
   const dispatch = useDispatch();
   const { token } = useParams();
+  const navigate = useNavigate();
 
   // Update these selectors to point to the auth slice
   const loading = useSelector((state) => state.auth.loading);
@@ -20,6 +20,13 @@ const EmailVerificationPage = () => {
       dispatch(verifyEmail(token));
     }
   };
+
+  // Redirect to sign-in page after successful verification
+  useEffect(() => {
+    if (emailVerified) {
+      navigate("/signin"); // Replace "/signin" with your actual sign-in route
+    }
+  }, [emailVerified, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f7f3f3]">
