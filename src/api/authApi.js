@@ -1,8 +1,10 @@
 import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 const apiClient = axios.create({
-  baseURL: "https://your-api-url.com/api/auth", 
+  baseURL: `${API_BASE_URL}/api/v1/users`,
   headers: {
     "Content-Type": "application/json",
   },
@@ -15,15 +17,14 @@ const apiPost = async (url, data, token = null) => {
 };
 
 const signUpUser = (userData) => apiPost("/signup", userData);
-const signInUser = (userData) => apiPost("/signin", userData);
-const verifyUserEmail = (token) => apiPost("/verify", {}, token);
-const resendVerificationEmail = (email) =>
-  apiPost("/resend-verification", { email });
+const signInUser = (userData) => apiPost("/login", userData);
+const verifyUserEmail = (token) => apiPost(`/verify/${token}`);
+const resendVerificationEmail = (email) => apiPost("/resendVerify", { email });
 
-const forgotPasswordRequest = (email) => apiPost("/forgot-password", { email });
+const forgotPasswordRequest = (email) => apiPost("/forgotPassword", { email });
 
 const resetUserPassword = (token, newPassword) =>
-  apiPost(`/reset-password/${token}`, { newPassword });
+  apiPost(`/resetPassword/${token}`, { newPassword });
 
 const extractErrorMessage = (error, defaultMsg) => {
   return error.response?.data?.message || error.message || defaultMsg;
