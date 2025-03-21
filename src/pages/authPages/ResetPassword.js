@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { resetPassword } from "../../api/authApi";
+import { resetPassword } from "../../api/auth/authApi";
 import { useParams, useNavigate } from "react-router-dom";
 
 const ResetPassword = () => {
@@ -62,7 +62,13 @@ const ResetPassword = () => {
 
     setIsSubmitting(true);
     try {
-      dispatch(resetPassword({ token, newPassword }));
+      dispatch(
+        resetPassword({
+          token,
+          password: newPassword,
+          passwordConfirm: confirmPassword,
+        })
+      );
     } finally {
       setIsSubmitting(false);
     }

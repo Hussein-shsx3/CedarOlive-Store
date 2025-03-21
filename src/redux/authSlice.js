@@ -6,21 +6,21 @@ import {
   resendVerification,
   forgotPassword,
   resetPassword,
-} from "../api/authApi";
+} from "../api/auth/authApi";
 import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
 
 const initialState = {
-  user: null,
-  token: cookies.get("token") || null,
-  loading: false,
-  error: null,
-  emailVerified: false,
-  resendSuccess: false, 
-  resendError: null, 
-  forgotPasswordSuccess: false, 
-  resetPasswordSuccess: false, 
+  user: null, // Logged-in user data
+  token: cookies.get("token") || null, // JWT token from cookies
+  loading: false, // Loading state for async operations
+  error: null, // Error message for failed operations
+  emailVerified: false, // Whether the user's email is verified
+  resendSuccess: false, // Whether resend verification email was successful
+  resendError: null, // Error message for resend verification
+  forgotPasswordSuccess: false, // Whether forgot password request was successful
+  resetPasswordSuccess: false, // Whether password reset was successful
 };
 
 const authSlice = createSlice({
@@ -45,12 +45,11 @@ const authSlice = createSlice({
         state.loading = false;
         const { user } = action.payload;
         state.user = user;
-        state.token = null;
-        cookies.remove("token", { path: "/" });
       })
       .addCase(signUp.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || "Sign-up failed";
+        console.error("Sign-up error:", action.payload);
       })
 
       // Sign-in cases
@@ -65,12 +64,13 @@ const authSlice = createSlice({
         state.token = token;
         cookies.set("token", token, {
           path: "/",
-          expires: new Date(Date.now() + 3600 * 1000),
+          expires: new Date(Date.now() + 3600 * 1000), // 1 hour
         });
       })
       .addCase(signIn.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || "Sign-in failed";
+        console.error("Sign-in error:", action.payload);
       })
 
       // Email verification cases
@@ -86,6 +86,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.emailVerified = false;
         state.error = action.payload?.message || "Email verification failed";
+        console.error("Email verification error:", action.payload);
       })
 
       // Resend verification cases
@@ -103,9 +104,10 @@ const authSlice = createSlice({
         state.resendSuccess = false;
         state.resendError =
           action.payload?.message || "Resend verification failed";
+        console.error("Resend verification error:", action.payload);
       })
 
-      // ✅ Forgot Password cases
+      // Forgot Password cases
       .addCase(forgotPassword.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -120,9 +122,10 @@ const authSlice = createSlice({
         state.forgotPasswordSuccess = false;
         state.error =
           action.payload?.message || "Forgot password request failed";
+        console.error("Forgot password error:", action.payload);
       })
 
-      // ✅ Reset Password cases
+      // Reset Password cases
       .addCase(resetPassword.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -136,6 +139,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.resetPasswordSuccess = false;
         state.error = action.payload?.message || "Reset password failed";
+        console.error("Reset password error:", action.payload);
       });
   },
 });

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { signIn } from "../../api/authApi";
+import { signIn } from "../../api/auth/authApi";
 
 const SignIn = () => {
   const [formData, setFormData] = useState({

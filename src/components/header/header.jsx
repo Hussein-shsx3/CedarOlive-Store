@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGetCurrentUser } from "../../api/users/userApi";
+import { logout } from "../../redux/authSlice";
 import { removeFromCart, clearCart } from "../../redux/cartSlice";
 
 const Header = () => {
@@ -10,17 +13,14 @@ const Header = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-
-  // Connect to Redux store
-  const { cartItems, totalAmount } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
-  // Assuming user data would come from Redux, we can mock it for now
-  const user = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    avatar: "/api/placeholder/32/32", // Placeholder for user avatar
-  };
+  // Get current user using React Query
+  const { data: user } = useGetCurrentUser();
+
+  // Redux store data
+  const { cartItems, totalAmount } = useSelector((state) => state.cart);
 
   const navLinks = [
     { title: "About", path: "/about" },
@@ -42,9 +42,9 @@ const Header = () => {
     { title: "Settings", path: "/account/settings" },
   ];
 
+  // Toggle functions remain the same
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
-    // Close other overlays if open
     if (isMenuOpen) setIsMenuOpen(false);
     if (isSearchOpen) setIsSearchOpen(false);
     if (isProfileOpen) setIsProfileOpen(false);
@@ -52,7 +52,6 @@ const Header = () => {
 
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
-    // Close other overlays if open
     if (isMenuOpen) setIsMenuOpen(false);
     if (isCartOpen) setIsCartOpen(false);
     if (isProfileOpen) setIsProfileOpen(false);
@@ -60,7 +59,6 @@ const Header = () => {
 
   const toggleProfile = () => {
     setIsProfileOpen(!isProfileOpen);
-    // Close other overlays if open
     if (isMenuOpen) setIsMenuOpen(false);
     if (isCartOpen) setIsCartOpen(false);
     if (isSearchOpen) setIsSearchOpen(false);
@@ -85,8 +83,9 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    // Here you would implement logout logic
-    // For example: dispatch(logout());
+    dispatch(logout());
+    dispatch(clearCart());
+    queryClient.removeQueries(["currentUser"]);
     setIsProfileOpen(false);
     navigate("/signIn");
   };
@@ -189,9 +188,9 @@ const Header = () => {
                 </svg>
               </button>
 
-              {/* User Profile */}
+              {/* User Profile Section */}
               <div className="relative">
-                {!user ? (
+                {user ? (
                   <>
                     <button
                       className="flex items-center hover:text-secondary transition duration-200"
@@ -199,14 +198,13 @@ const Header = () => {
                     >
                       <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
                         <img
-                          src={user.avatar}
+                          src={user.avatar || "/api/placeholder/32/32"}
                           alt="User"
                           className="w-full h-full object-cover"
                         />
                       </div>
                     </button>
 
-                    {/* Profile Dropdown */}
                     <div
                       className={`absolute right-0 w-56 mt-2 bg-white rounded-md shadow-lg z-50 transition-all duration-200 ease-in-out ${
                         isProfileOpen
@@ -215,7 +213,7 @@ const Header = () => {
                       }`}
                     >
                       <div className="p-3 border-b">
-                        <p className="font-medium">{user.firstName} {user.lastName}</p>
+                        <p className="font-medium">{user.name}</p>
                         <p className="text-sm text-gray-500">{user.email}</p>
                       </div>
                       <div className="py-1">
@@ -250,6 +248,7 @@ const Header = () => {
                 )}
               </div>
 
+              {/* Cart Section */}
               <div className="relative">
                 <button
                   className="p-1 hover:text-secondary transition duration-200"
@@ -376,6 +375,7 @@ const Header = () => {
                   </div>
                 </div>
               </div>
+
               <button
                 className="md:hidden p-1 hover:text-gray-600 transition duration-200"
                 onClick={() => {
@@ -407,6 +407,8 @@ const Header = () => {
           </div>
         </div>
       </header>
+
+      {/* Mobile Menu */}
       <div
         className={`md:hidden bg-white w-full shadow-md transition-all duration-300 ease-in-out overflow-hidden ${
           isMenuOpen ? "max-h-[400px] py-4" : "max-h-0"

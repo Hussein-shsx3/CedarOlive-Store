@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { verifyEmail } from "../../api/authApi";
+import { verifyEmail } from "../../api/auth/authApi";
 
 const EmailVerificationPage = () => {
   const dispatch = useDispatch();

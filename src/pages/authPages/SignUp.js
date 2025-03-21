@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { signUp } from "../../api/authApi";
+import { signUp } from "../../api/auth/authApi";
 import { Link } from "react-router-dom";
 
 const SignUp = () => {
