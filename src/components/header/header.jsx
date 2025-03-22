@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useGetCurrentUser } from "../../api/users/userApi";
 import { logout } from "../../redux/authSlice";
 import { removeFromCart, clearCart } from "../../redux/cartSlice";
+import { User } from "lucide-react";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -36,10 +37,10 @@ const Header = () => {
   ];
 
   const profileLinks = [
-    { title: "My Account", path: "/account" },
-    { title: "My Orders", path: "/account/orders" },
-    { title: "Wishlist", path: "/account/wishlist" },
-    { title: "Settings", path: "/account/settings" },
+    { title: "My Profile", path: "/profile" },
+    { title: "My Orders", path: "/profile/orders" },
+    { title: "Wishlist", path: "/profile/wishlist" },
+    { title: "Payment", path: "/profile/payment" },
   ];
 
   // Toggle functions remain the same
@@ -196,12 +197,19 @@ const Header = () => {
                       className="flex items-center hover:text-secondary transition duration-200"
                       onClick={toggleProfile}
                     >
-                      <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-                        <img
-                          src={user.avatar || "/api/placeholder/32/32"}
-                          alt="User"
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                        {user?.avatar ? (
+                          <img
+                            src={user.avatar}
+                            alt="User"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User
+                            size={64}
+                            className="text-icons p-2"
+                          />
+                        )}
                       </div>
                     </button>
 

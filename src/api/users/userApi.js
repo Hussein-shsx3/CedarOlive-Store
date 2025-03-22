@@ -25,11 +25,11 @@ export const useGetCurrentUser = () =>
     queryKey: ["currentUser"],
     queryFn: async () => {
       const { data } = await api.get("/me");
-      return data;
+      const user = data.data.data;
+      return user;
     },
     enabled: !!cookies.get("token"),
   });
-
 
 export const useGetAllUsers = () =>
   useQuery({
@@ -46,8 +46,8 @@ export const useGetUserById = (userId) =>
     queryKey: ["user", userId],
     queryFn: async () => {
       if (!userId) throw new Error("User ID is required.");
-      const { data } = await api.get(`/${userId}`);
-      return data;
+      const response = await api.get(`/${userId}`);
+      return response.data;
     },
     enabled: !!userId && !!cookies.get("token"),
   });
