@@ -1,14 +1,36 @@
-import React, { useState, useEffect } from "react";
-import { User, Mail, Phone, MapPin, Edit, Save, X, Loader } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Edit,
+  Save,
+  X,
+  Loader,
+  Upload,
+} from "lucide-react";
 import { useDispatch } from "react-redux";
 import { updateMe } from "../../api/users/userApi";
 import { useQueryClient } from "@tanstack/react-query";
+import { useOutletContext } from "react-router-dom";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const PersonalInformation = ({ user }) => {
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+
+const PersonalInformation = () => {
+  const { user } = useOutletContext();
+  console.log(user);
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [photo, setPhoto] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -16,7 +38,17 @@ const PersonalInformation = ({ user }) => {
     address: "",
   });
 
+  // Update form data whenever user prop changes
   useEffect(() => {
+    // Handle user data loading state
+    if (user === undefined) {
+      setIsLoading(true);
+      return;
+    }
+
+    setIsLoading(false);
+
+    // Only update form if user exists
     if (user) {
       setFormData({
         name: user.name || "",
@@ -24,6 +56,11 @@ const PersonalInformation = ({ user }) => {
         phone: user.phone || "",
         address: user.address || "",
       });
+
+      // Set photo preview if user has a photo
+      if (user.photo) {
+        setPhotoPreview(user.photo);
+      }
     }
   }, [user]);
 
@@ -35,27 +72,120 @@ const PersonalInformation = ({ user }) => {
     }));
   };
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("Image size should be less than 5MB!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+
+    setPhoto(file);
+
+    // Create a preview URL for the selected image
+    const previewUrl = URL.createObjectURL(file);
+    setPhotoPreview(previewUrl);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsUpdating(true);
-    try {
-      await dispatch(updateMe(formData)).unwrap();
 
-      await queryClient.invalidateQueries({
-        queryKey: ["currentUser"],
-        exact: true,
-      });
+    try {
+      // Create a FormData object to handle file upload
+      const submitData = new FormData();
+
+      // Append text fields
+      submitData.append("name", formData.name);
+      submitData.append("email", formData.email);
+      submitData.append("phone", formData.phone || "");
+      submitData.append("address", formData.address || "");
+
+      // Only append photo if a new one was selected
+      if (photo) {
+        submitData.append("photo", photo);
+      }
+
+      const result = await dispatch(updateMe(submitData)).unwrap();
+
+      if (result && result.status === "success") {
+        toast.success("Profile updated successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+
+        // Invalidate and refetch user data
+        await queryClient.invalidateQueries({
+          queryKey: ["currentUser"],
+          exact: true,
+        });
+      }
 
       setIsEditing(false);
     } catch (error) {
       console.error("Failed to update profile:", error);
+      toast.error("Failed to update profile. Please try again.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
     } finally {
       setIsUpdating(false);
     }
   };
 
+  const triggerFileInput = () => {
+    fileInputRef.current.click();
+  };
+
+  const removePhoto = () => {
+    setPhoto(null);
+    setPhotoPreview(user?.photo || null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8">
+        <Loader
+          size={40}
+          className="animate-spin mb-4"
+          style={{ color: "var(--color-secondary)" }}
+        />
+        <p
+          className="text-lg font-medium"
+          style={{ color: "var(--color-title)" }}
+        >
+          Loading user information...
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <div className="flex justify-between items-center mb-8">
         <h2
           className="text-2xl font-semibold"
@@ -79,7 +209,7 @@ const PersonalInformation = ({ user }) => {
       </div>
 
       {isEditing ? (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} encType="multipart/form-data">
           {isUpdating && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
@@ -97,6 +227,73 @@ const PersonalInformation = ({ user }) => {
               </div>
             </div>
           )}
+
+          {/* Photo Upload Section */}
+          <div className="mb-8">
+            <label
+              className="block mb-3 text-base font-medium"
+              style={{ color: "var(--color-text)" }}
+            >
+              Profile Picture
+            </label>
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <div
+                className="w-32 h-32 rounded-full overflow-hidden border flex items-center justify-center"
+                style={{ borderColor: "var(--color-border)" }}
+              >
+                {photoPreview ? (
+                  <img
+                    src={photoPreview}
+                    alt="Profile preview"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User size={48} style={{ color: "var(--color-icons)" }} />
+                )}
+              </div>
+              <div className="flex flex-col gap-3">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  className="hidden"
+                  ref={fileInputRef}
+                  name="photo"
+                />
+                <button
+                  type="button"
+                  onClick={triggerFileInput}
+                  className="px-4 py-2 rounded-md text-base font-medium flex items-center"
+                  style={{
+                    backgroundColor: "var(--color-primary)",
+                    color: "var(--color-title)",
+                  }}
+                >
+                  <Upload size={16} className="mr-2" />
+                  Upload Image
+                </button>
+                {photoPreview && (
+                  <button
+                    type="button"
+                    onClick={removePhoto}
+                    className="px-4 py-2 rounded-md text-base font-medium flex items-center"
+                    style={{
+                      backgroundColor: "white",
+                      color: "var(--color-title)",
+                      border: "1px solid",
+                      borderColor: "var(--color-border)",
+                    }}
+                  >
+                    <X size={16} className="mr-2" />
+                    Remove Image
+                  </button>
+                )}
+                <p className="text-sm" style={{ color: "var(--color-text)" }}>
+                  Recommended: Square image, max size 5MB
+                </p>
+              </div>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div>
@@ -182,7 +379,7 @@ const PersonalInformation = ({ user }) => {
                 <input
                   type="tel"
                   name="phone"
-                  value={formData.phone}
+                  value={formData.phone || ""}
                   onChange={handleInputChange}
                   className="p-4 flex-1 w-full outline-none text-base"
                   style={{ color: "var(--color-title)" }}
@@ -212,7 +409,7 @@ const PersonalInformation = ({ user }) => {
                 <input
                   type="text"
                   name="address"
-                  value={formData.address}
+                  value={formData.address || ""}
                   onChange={handleInputChange}
                   className="p-4 flex-1 w-full outline-none text-base"
                   style={{ color: "var(--color-title)" }}
@@ -253,6 +450,11 @@ const PersonalInformation = ({ user }) => {
                     phone: user.phone || "",
                     address: user.address || "",
                   });
+                  setPhotoPreview(user.photo || null);
+                }
+                setPhoto(null);
+                if (fileInputRef.current) {
+                  fileInputRef.current.value = "";
                 }
               }}
               className="px-6 py-3 rounded-md text-base font-medium flex items-center"
@@ -271,6 +473,38 @@ const PersonalInformation = ({ user }) => {
         </form>
       ) : (
         <div className="space-y-8">
+          {/* Photo Display (View Mode) */}
+          <div
+            className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b"
+            style={{ borderColor: "var(--color-border)" }}
+          >
+            <div
+              className="w-32 h-32 rounded-full overflow-hidden border flex items-center justify-center"
+              style={{ borderColor: "var(--color-border)" }}
+            >
+              {user?.photo ? (
+                <img
+                  src={user.photo}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User size={48} style={{ color: "var(--color-icons)" }} />
+              )}
+            </div>
+            <div>
+              <h3
+                className="text-xl font-medium"
+                style={{ color: "var(--color-title)" }}
+              >
+                {user?.name || "User Name"}
+              </h3>
+              <p className="text-base" style={{ color: "var(--color-text)" }}>
+                {user?.email || "user@example.com"}
+              </p>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <label
@@ -376,4 +610,3 @@ const PersonalInformation = ({ user }) => {
 };
 
 export default PersonalInformation;
-

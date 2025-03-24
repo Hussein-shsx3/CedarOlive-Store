@@ -19,13 +19,11 @@ import ScrollToTop from "../../components/scrollToTop";
 const cookies = new Cookies();
 
 const Profile = () => {
-  const { data: currentUser, isLoading, isError } = useGetCurrentUser();
-  const user = currentUser;
+  const { data: user, isLoading, isError } = useGetCurrentUser();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation(); // Use the useLocation hook
+  const location = useLocation();
 
-  // Check for token and redirect if not found
   useEffect(() => {
     const token = cookies.get("token");
     if (!token) {
@@ -96,9 +94,9 @@ const Profile = () => {
             <div className="flex flex-col md:flex-row items-center">
               <div className="relative mb-4 md:mb-0 md:mr-8">
                 <div className="h-24 w-24 md:h-40 md:w-40 rounded-full bg-gray-200 overflow-hidden border-4 border-white flex items-center justify-center">
-                  {user?.avatar ? (
+                  {user?.photo ? (
                     <img
-                      src={user.avatar}
+                      src={user?.photo}
                       alt="Profile"
                       className="h-full w-full object-cover"
                     />
@@ -236,7 +234,7 @@ const Profile = () => {
             className="bg-white rounded-lg shadow-md p-6 md:p-8"
             style={{ borderColor: "var(--color-border)" }}
           >
-            <Outlet context={{ user }} /> {/* Pass user as context */}
+            <Outlet context={{ user }} />
           </div>
         </div>
       </div>

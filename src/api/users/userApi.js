@@ -25,7 +25,7 @@ export const useGetCurrentUser = () =>
     queryKey: ["currentUser"],
     queryFn: async () => {
       const { data } = await api.get("/me");
-      const user = data.data.data;
+      const user = data.data;
       return user;
     },
     enabled: !!cookies.get("token"),

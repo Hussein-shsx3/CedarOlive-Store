@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Section1 = () => {
   return (
@@ -14,9 +15,16 @@ const Section1 = () => {
           Pillows, mugs, aprons, jigsaw puzzles, & more, designed and sold by
           independent artists.
         </p>
-        <button className="text-base md:text-lg bg-secondary px-6 md:px-8 py-3 md:py-4 text-white transition duration-200 hover:bg-opacity-90">
-          Shop Now
-        </button>
+        <Link
+          to="/shop/All"
+          class="group relative overflow-hidden px-[1.8em] py-[0.8em] border-2 border-[#A0522D] bg-transparent text-center uppercase text-lg transition duration-300 ease-in-out font-inherit text-[#A0522D]"
+        >
+          <span class="absolute inset-0 w-0 h-[400%] bg-[#A0522D] transform -translate-x-1/2 -translate-y-1/2 rotate-45 transition-all duration-500 ease group-hover:w-[255%]"></span>
+
+          <span class="relative transition-colors duration-300 group-hover:text-white">
+            Shop Now
+          </span>
+        </Link>
       </div>
       <div className="w-full md:w-1/2 h-[50dvh] md:h-full">
         <img

@@ -42,7 +42,7 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        index: true, // Default route for /profile
+        index: true, 
         element: <PersonalInformation />,
       },
       {

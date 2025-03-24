@@ -6,6 +6,7 @@ import { useGetCurrentUser } from "../../api/users/userApi";
 import { logout } from "../../redux/authSlice";
 import { removeFromCart, clearCart } from "../../redux/cartSlice";
 import { User } from "lucide-react";
+import { toast } from "react-toastify"; // Make sure to import toast
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -89,6 +90,45 @@ const Header = () => {
     queryClient.removeQueries(["currentUser"]);
     setIsProfileOpen(false);
     navigate("/signIn");
+  };
+
+  // New function to handle checkout process
+  const handleCheckout = () => {
+    if (!user) {
+      // Show toast notification first
+      toast.info("Please sign in to continue with checkout", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+
+      // Use setTimeout to ensure toast is shown before redirect
+      setTimeout(() => {
+        // Redirect to sign in page
+        navigate("/signIn", {
+          state: {
+            from: "/checkout",
+            message: "Please sign in to complete your purchase",
+          },
+        });
+      }, 3000); // Small delay to ensure toast appears
+    } else {
+      // Show success toast
+      toast.success("Proceeding to checkout...", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+
+      // Navigate to checkout page
+      navigate("/checkout");
+    }
   };
 
   return (
@@ -198,17 +238,14 @@ const Header = () => {
                       onClick={toggleProfile}
                     >
                       <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-                        {user?.avatar ? (
+                        {user?.photo ? (
                           <img
-                            src={user.avatar}
+                            src={user.photo}
                             alt="User"
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <User
-                            size={64}
-                            className="text-icons p-2"
-                          />
+                          <User size={64} className="text-icons p-2" />
                         )}
                       </div>
                     </button>
@@ -249,9 +286,10 @@ const Header = () => {
                 ) : (
                   <Link
                     to="/signIn"
-                    className="px-4 py-2 bg-secondary text-white rounded hover:bg-[#aa7b5a] transition duration-200"
+                    className="group relative inline-block px-4 py-2 text-white bg-secondary overflow-hidden"
                   >
-                    Sign In
+                    <span className="absolute inset-0 bg-[#9a4a25] transition-transform duration-300 ease transform scale-x-0 origin-left group-hover:scale-x-100"></span>
+                    <span className="relative">Sign In</span>
                   </Link>
                 )}
               </div>
@@ -369,7 +407,11 @@ const Header = () => {
                         ${totalAmount.toFixed(2)} USD
                       </span>
                     </div>
-                    <button className="w-full bg-secondary text-white py-3 px-6 hover:bg-[#aa7b5a] transition duration-200 mb-2">
+                    <button
+                      className="w-full bg-secondary text-white py-3 px-6 hover:bg-[#aa7b5a] transition duration-200 mb-2"
+                      onClick={handleCheckout}
+                      disabled={cartItems.length === 0}
+                    >
                       Continue to Checkout
                     </button>
                     {cartItems.length > 0 && (
