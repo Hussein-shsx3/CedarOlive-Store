@@ -54,17 +54,17 @@ export const useGetUserById = (userId) =>
 
 export const updateMe = createAsyncThunk(
   "user/updateMe",
-  async (userData, thunkAPI) => {
-    const token = cookies.get("token");
-    if (!token) {
-      return thunkAPI.rejectWithValue("Authentication token is missing.");
-    }
+  async (formData, thunkAPI) => {
     try {
-      const response = await api.patch("/updateMe", userData);
+      const response = await api.patch("/updateMe", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "User update failed."
+        error.response?.data?.message || "Update failed"
       );
     }
   }

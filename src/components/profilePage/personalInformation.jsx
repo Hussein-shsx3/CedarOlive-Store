@@ -22,7 +22,6 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 
 const PersonalInformation = () => {
   const { user } = useOutletContext();
-  console.log(user);
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
@@ -40,15 +39,11 @@ const PersonalInformation = () => {
 
   // Update form data whenever user prop changes
   useEffect(() => {
-    // Handle user data loading state
     if (user === undefined) {
       setIsLoading(true);
       return;
     }
-
     setIsLoading(false);
-
-    // Only update form if user exists
     if (user) {
       setFormData({
         name: user.name || "",
@@ -56,8 +51,7 @@ const PersonalInformation = () => {
         phone: user.phone || "",
         address: user.address || "",
       });
-
-      // Set photo preview if user has a photo
+      // Use user.photo as default preview if available
       if (user.photo) {
         setPhotoPreview(user.photo);
       }
@@ -82,13 +76,11 @@ const PersonalInformation = () => {
         position: "top-right",
         autoClose: 3000,
       });
-      // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
       return;
     }
-
     setPhoto(file);
 
     // Create a preview URL for the selected image
@@ -110,11 +102,12 @@ const PersonalInformation = () => {
       submitData.append("phone", formData.phone || "");
       submitData.append("address", formData.address || "");
 
-      // Only append photo if a new one was selected
+      // Append the photo if a new one was selected
       if (photo) {
         submitData.append("photo", photo);
       }
 
+      // NOTE: Ensure that your updateMe API in your Redux slice does NOT force JSON headers.
       const result = await dispatch(updateMe(submitData)).unwrap();
 
       if (result && result.status === "success") {
@@ -122,14 +115,12 @@ const PersonalInformation = () => {
           position: "top-right",
           autoClose: 3000,
         });
-
         // Invalidate and refetch user data
         await queryClient.invalidateQueries({
           queryKey: ["currentUser"],
           exact: true,
         });
       }
-
       setIsEditing(false);
     } catch (error) {
       console.error("Failed to update profile:", error);
@@ -143,7 +134,7 @@ const PersonalInformation = () => {
   };
 
   const triggerFileInput = () => {
-    fileInputRef.current.click();
+    if (fileInputRef.current) fileInputRef.current.click();
   };
 
   const removePhoto = () => {
