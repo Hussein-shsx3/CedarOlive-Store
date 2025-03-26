@@ -9,6 +9,7 @@ import Blog from "./pages/Blog";
 import SignUp from "./pages/authPages/SignUp";
 import SignIn from "./pages/authPages/SignIn";
 import AdminDashboard from "./pages/AdminDashboard";
+import Contact from "./pages/Contact";
 import EmailVerificationPage from "./pages/authPages/EmailVerificationPage";
 import ResendVerification from "./pages/authPages/ResendVerification";
 import ForgotPassword from "./pages/authPages/ForgotPassword";
@@ -19,6 +20,10 @@ import Orders from "./components/profilePage/orders";
 import Payment from "./components/profilePage/payment";
 import PersonalInformation from "./components/profilePage/personalInformation";
 import Wishlist from "./components/profilePage/wishlist";
+
+//Admin Page
+import Dashboard from "./components/adminPage/Dashboard";
+import Customers from "./components/adminPage/Customers";
 
 const router = createBrowserRouter([
   {
@@ -42,7 +47,7 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        index: true, 
+        index: true,
         element: <PersonalInformation />,
       },
       {
@@ -68,6 +73,10 @@ const router = createBrowserRouter([
     element: <About />,
   },
   {
+    path: "/contact",
+    element: <Contact />,
+  },
+  {
     path: "/blog",
     element: <Blog />,
   },
@@ -86,6 +95,16 @@ const router = createBrowserRouter([
         <AdminDashboard />
       </PrivateRoute>
     ),
+    children: [
+      {
+        path: "/admin",
+        element: <Dashboard />,
+      },
+      {
+        path: "/admin/customers",
+        element: <Customers />,
+      },
+    ],
   },
   {
     path: "/verify/:token",

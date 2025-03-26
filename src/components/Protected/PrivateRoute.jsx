@@ -1,14 +1,18 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-
-// Mock authentication function (you can replace this with real logic)
-const isAuthenticated = () => {
-  const user = { isAdmin: true }; // Example: Replace this with real authentication logic
-  return user.isAdmin;
-};
+import { useGetCurrentUser } from "../../api/users/userApi";
+import LoadingSpinner from "../loading/LoadingSpinner";
 
 function PrivateRoute({ children }) {
-  return isAuthenticated() ? children : <Navigate to="/" />;
+  const { data: user, isLoading } = useGetCurrentUser();
+
+  // Show a loading state while fetching user data
+  if (isLoading) return <LoadingSpinner />;
+
+  // If the user data is available, check the role
+  const isAdmin = user?.role === "admin";
+
+  return isAdmin ? children : <Navigate to="/" />;
 }
 
 export default PrivateRoute;

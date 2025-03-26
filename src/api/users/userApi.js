@@ -36,7 +36,7 @@ export const useGetAllUsers = () =>
     queryKey: ["allUsers"],
     queryFn: async () => {
       const { data } = await api.get("/");
-      return data;
+      return data.data;
     },
     enabled: !!cookies.get("token"),
   });
