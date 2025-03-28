@@ -12,6 +12,7 @@ import {
   Heart,
   LogOut,
   User,
+  Settings,
 } from "lucide-react";
 import Header from "../../components/header/header";
 import ScrollToTop from "../../components/scrollToTop";
@@ -225,6 +226,22 @@ const Profile = () => {
               >
                 <Heart size={20} className="mr-2" />
                 <span className="truncate">Wishlist</span>
+              </Link>
+              <Link
+                to="/profile/settings"
+                className={`flex-1 md:flex-none px-5 py-4 font-medium text-base flex items-center justify-center md:justify-start ${
+                  location.pathname === "/profile/settings" ? "border-b-2" : ""
+                }`}
+                style={{
+                  color:
+                    location.pathname === "/profile/settings"
+                      ? "var(--color-secondary)"
+                      : "var(--color-text)",
+                  borderColor: "var(--color-secondary)",
+                }}
+              >
+                <Settings size={20} className="mr-2" />
+                <span className="truncate">Settings</span>
               </Link>
             </nav>
           </div>

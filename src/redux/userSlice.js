@@ -29,11 +29,38 @@ const userSlice = createSlice({
     setUserById(state, action) {
       state.userById = action.payload;
     },
+    resetUserStatus(state) {
+      state.status = "idle";
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
+      .addCase(updateUserById.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(updateUserById.fulfilled, (state, action) => {
+        state.status = "succeeded";
+
+        const index = state.allUsers.findIndex(
+          (user) => user.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.allUsers[index] = action.payload;
+        }
+
+        if (state.userById && state.userById.id === action.payload.id) {
+          state.userById = action.payload;
+        }
+      })
+      .addCase(updateUserById.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "User update failed";
+      })
       .addCase(updateMe.pending, (state) => {
         state.status = "loading";
+        state.error = null;
       })
       .addCase(updateMe.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -41,31 +68,34 @@ const userSlice = createSlice({
       })
       .addCase(updateMe.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload;
+        state.error = action.payload || "Update me failed";
       })
       .addCase(updatePassword.pending, (state) => {
         state.status = "loading";
+        state.error = null;
       })
       .addCase(updatePassword.fulfilled, (state) => {
         state.status = "succeeded";
       })
       .addCase(updatePassword.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload;
+        state.error = action.payload || "Update password failed";
       })
       .addCase(deleteMe.pending, (state) => {
         state.status = "loading";
+        state.error = null;
       })
       .addCase(deleteMe.fulfilled, (state) => {
         state.status = "succeeded";
-        state.currentUser = null; // User is deleted
+        state.currentUser = null;
       })
       .addCase(deleteMe.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload;
+        state.error = action.payload || "Delete me failed";
       })
       .addCase(createUser.pending, (state) => {
         state.status = "loading";
+        state.error = null;
       })
       .addCase(createUser.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -73,37 +103,30 @@ const userSlice = createSlice({
       })
       .addCase(createUser.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload;
-      })
-      .addCase(updateUserById.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(updateUserById.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.allUsers = state.allUsers.map((user) =>
-          user.id === action.payload.id ? action.payload : user
-        );
-      })
-      .addCase(updateUserById.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
+        state.error = action.payload || "Create user failed";
       })
       .addCase(deleteUserById.pending, (state) => {
         state.status = "loading";
+        state.error = null;
       })
       .addCase(deleteUserById.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.allUsers = state.allUsers.filter(
-          (user) => user.id !== action.meta.arg
+          (user) => user.id !== action.payload.id
         );
+
+        if (state.userById && state.userById.id === action.payload.id) {
+          state.userById = null;
+        }
       })
       .addCase(deleteUserById.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload;
+        state.error = action.payload || "Delete user by ID failed";
       });
   },
 });
 
-export const { setCurrentUser, setAllUsers, setUserById } = userSlice.actions;
+export const { setCurrentUser, setAllUsers, setUserById, resetUserStatus } =
+  userSlice.actions;
 
 export default userSlice.reducer;

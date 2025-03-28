@@ -47,7 +47,7 @@ export const useGetUserById = (userId) =>
     queryFn: async () => {
       if (!userId) throw new Error("User ID is required.");
       const response = await api.get(`/${userId}`);
-      return response.data;
+      return response.data.data;
     },
     enabled: !!userId && !!cookies.get("token"),
   });
@@ -126,14 +126,14 @@ export const createUser = createAsyncThunk(
 
 export const updateUserById = createAsyncThunk(
   "user/updateUserById",
-  async ({ userId, updateData }, thunkAPI) => {
+  async ({ userId, userData }, thunkAPI) => {
     const token = cookies.get("token");
     if (!token) {
       return thunkAPI.rejectWithValue("Authentication token is missing.");
     }
     try {
-      const response = await api.patch(`/${userId}`, updateData);
-      return response.data;
+      const response = await api.patch(`/${userId}`, userData);
+      return response.data.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || "User update failed."

@@ -1,25 +1,44 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useGetUserById } from "../../../api/users/userApi";
-import { updateUserById } from "../../../api/users/userApi";
-import { User, Mail, Phone, MapPin, Save, Loader2 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { useGetUserById, updateUserById } from "../../../api/users/userApi";
+import { resetUserStatus } from "../../../redux/userSlice";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Save,
+  Loader2,
+  ArrowLeft,
+} from "lucide-react";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const EditUserPage = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { status, error } = useSelector((state) => state.user);
 
-  // Use the React Query hook to fetch user data
-  const { data: user, isLoading, isError, error } = useGetUserById(userId);
+  // Get user data
+  const {
+    data: user,
+    isLoading,
+    isError,
+    error: fetchError,
+  } = useGetUserById(userId);
 
-  // Initialize form state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     address: "",
   });
+  const [isDirty, setIsDirty] = useState(false);
 
-  // Populate form with existing user data when data is fetched
+  // Initialize form data
   useEffect(() => {
     if (user) {
       setFormData({
@@ -31,159 +50,192 @@ const EditUserPage = () => {
     }
   }, [user]);
 
-  // Handle input changes
+  // Handle update status changes
+  useEffect(() => {
+    if (status === "succeeded") {
+      toast.success("User updated successfully!");
+      dispatch(resetUserStatus());
+    }
+    if (status === "failed") {
+      toast.error(error || "Failed to update user");
+    }
+  }, [status, error, dispatch, navigate]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+    setIsDirty(true);
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      // Perform user update
-      await updateUserById({
+    if (!isDirty) return;
+
+    dispatch(
+      updateUserById({
         userId,
         userData: formData,
-      });
-
-      // Navigate back to users list or dashboard
-      navigate("/admin/users");
-    } catch (error) {
-      console.error("Failed to update user", error);
-      // Optionally, you could set an error state to show to the user
-    }
+      })
+    );
   };
 
-  // Loading state
+  const handleGoBack = () => navigate("/admin/customers");
+
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 flex justify-center items-center">
-        <div className="flex items-center text-[#A0522D]">
-          <Loader2 className="animate-spin mr-2" />
-          <span>Loading user data...</span>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4 py-8">
+        <div className="bg-white rounded-lg p-6 max-w-md w-full text-center border border-gray-200 shadow-sm">
+          <Loader2 className="animate-spin text-[#A0522D] w-12 h-12 mx-auto mb-4" />
+          <p className="text-gray-700 font-medium">Loading user data...</p>
         </div>
       </div>
     );
   }
 
-  // Error state
-  if (isError) {
+  if (isError || !user) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4 text-red-600">
-            Error Loading User
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4 py-8">
+        <div className="bg-white rounded-lg p-6 max-w-md w-full text-center border border-gray-200 shadow-sm">
+          <h2 className="text-xl font-semibold text-red-600 mb-4">
+            {isError ? "Error" : "User Not Found"}
           </h2>
-          <p>
-            {error?.message || "An error occurred while fetching user data"}
+          <p className="text-gray-600 mb-6">
+            {fetchError?.message || "The specified user could not be found."}
           </p>
-        </div>
-      </div>
-    );
-  }
-
-  // If no user found
-  if (!user) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4 text-red-600">
-            User Not Found
-          </h2>
-          <p>The specified user could not be found.</p>
+          <button
+            onClick={handleGoBack}
+            className="bg-[#A0522D] text-white px-4 py-2 rounded hover:bg-[#8B4513] transition flex items-center justify-center mx-auto"
+          >
+            <ArrowLeft className="mr-2" /> Go Back
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-[#A0522D]">
-          Edit User Details
-        </h2>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <ToastContainer position="top-right" autoClose={3000} />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Name Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              <User className="inline-block mr-2 text-[#A0522D]" /> Full Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A0522D] focus:ring focus:ring-[#A0522D]/50"
-              required
-            />
+      <div className="max-w-4xl mx-auto">
+        <button
+          onClick={handleGoBack}
+          className="flex items-center text-[#A0522D] hover:text-[#8B4513] mb-6 transition"
+        >
+          <ArrowLeft className="mr-2" /> Back to Users
+        </button>
+
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-lg border border-gray-200 shadow-sm"
+        >
+          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h2 className="text-xl font-semibold flex items-center text-gray-800">
+              <User className="mr-2 text-[#A0522D]" /> Edit User Details
+            </h2>
+            {!isDirty && (
+              <p className="text-sm text-gray-500 mt-1">
+                Current user information is displayed below
+              </p>
+            )}
           </div>
 
-          {/* Email Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              <Mail className="inline-block mr-2 text-[#A0522D]" /> Email
-              Address
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A0522D] focus:ring focus:ring-[#A0522D]/50"
-              required
-            />
-          </div>
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InputField
+                label="Full Name"
+                Icon={User}
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+              <InputField
+                label="Email Address"
+                Icon={Mail}
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+              <InputField
+                label="Phone Number"
+                Icon={Phone}
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+              />
+              <TextareaField
+                label="Address"
+                Icon={MapPin}
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+              />
+            </div>
 
-          {/* Phone Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              <Phone className="inline-block mr-2 text-[#A0522D]" /> Phone
-              Number
-            </label>
-            <input
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A0522D] focus:ring focus:ring-[#A0522D]/50"
-            />
+            <div className="flex justify-end pt-6 border-t border-gray-200">
+              <button
+                type="submit"
+                disabled={!isDirty || status === "loading"}
+                className={`bg-[#A0522D] text-white px-6 py-3 rounded-lg hover:bg-[#8B4513] transition flex items-center ${
+                  !isDirty || status === "loading"
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                {status === "loading" ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2" />
+                )}
+                Update User
+              </button>
+            </div>
           </div>
-
-          {/* Address Field */}
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700">
-              <MapPin className="inline-block mr-2 text-[#A0522D]" /> Address
-            </label>
-            <textarea
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              rows={3}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#A0522D] focus:ring focus:ring-[#A0522D]/50"
-            />
-          </div>
-        </div>
-
-        {/* Submit Button */}
-        <div className="mt-6">
-          <button
-            type="submit"
-            className="w-full bg-[#A0522D] text-white py-3 rounded-md hover:bg-[#8B4513] transition-colors flex items-center justify-center"
-          >
-            <Save className="inline-block mr-2" /> Update User Details
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };
+
+// Reusable Input Field Component
+const InputField = ({ label, Icon, ...props }) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      {label}
+    </label>
+    <div className="relative">
+      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <Icon className="text-[#A0522D] w-5 h-5" />
+      </div>
+      <input
+        {...props}
+        className="pl-10 w-full h-12 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#A0522D] focus:border-[#A0522D] hover:border-gray-400 transition"
+      />
+    </div>
+  </div>
+);
+
+const TextareaField = ({ label, Icon, ...props }) => (
+  <div className="md:col-span-2">
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      {label}
+    </label>
+    <div className="relative">
+      <div className="absolute top-3 left-3 pointer-events-none">
+        <Icon className="text-[#A0522D] w-5 h-5" />
+      </div>
+      <textarea
+        {...props}
+        rows={3}
+        className="pl-10 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#A0522D] focus:border-[#A0522D] hover:border-gray-400 transition"
+      />
+    </div>
+  </div>
+);
 
 export default EditUserPage;

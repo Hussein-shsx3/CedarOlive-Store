@@ -7,7 +7,7 @@ import {
   Edit,
   Save,
   X,
-  Loader,
+  Loader2 as Loader,
   Upload,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
@@ -51,7 +51,6 @@ const PersonalInformation = () => {
         phone: user.phone || "",
         address: user.address || "",
       });
-      // Use user.photo as default preview if available
       if (user.photo) {
         setPhotoPreview(user.photo);
       }
@@ -70,7 +69,6 @@ const PersonalInformation = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Check file size
     if (file.size > MAX_FILE_SIZE) {
       toast.error("Image size should be less than 5MB!", {
         position: "top-right",
@@ -83,7 +81,6 @@ const PersonalInformation = () => {
     }
     setPhoto(file);
 
-    // Create a preview URL for the selected image
     const previewUrl = URL.createObjectURL(file);
     setPhotoPreview(previewUrl);
   };
@@ -93,21 +90,16 @@ const PersonalInformation = () => {
     setIsUpdating(true);
 
     try {
-      // Create a FormData object to handle file upload
       const submitData = new FormData();
-
-      // Append text fields
       submitData.append("name", formData.name);
       submitData.append("email", formData.email);
       submitData.append("phone", formData.phone || "");
       submitData.append("address", formData.address || "");
 
-      // Append the photo if a new one was selected
       if (photo) {
         submitData.append("photo", photo);
       }
 
-      // NOTE: Ensure that your updateMe API in your Redux slice does NOT force JSON headers.
       const result = await dispatch(updateMe(submitData)).unwrap();
 
       if (result && result.status === "success") {
@@ -115,7 +107,6 @@ const PersonalInformation = () => {
           position: "top-right",
           autoClose: 3000,
         });
-        // Invalidate and refetch user data
         await queryClient.invalidateQueries({
           queryKey: ["currentUser"],
           exact: true,
@@ -145,19 +136,11 @@ const PersonalInformation = () => {
     }
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center p-8">
-        <Loader
-          size={40}
-          className="animate-spin mb-4"
-          style={{ color: "var(--color-secondary)" }}
-        />
-        <p
-          className="text-lg font-medium"
-          style={{ color: "var(--color-title)" }}
-        >
+        <Loader className="animate-spin mb-4 h-10 w-10 text-secondary" />
+        <p className="text-lg font-medium text-title">
           Loading user information...
         </p>
       </div>
@@ -178,22 +161,15 @@ const PersonalInformation = () => {
         pauseOnHover
       />
       <div className="flex justify-between items-center mb-8">
-        <h2
-          className="text-2xl font-semibold"
-          style={{ color: "var(--color-title)" }}
-        >
+        <h2 className="text-2xl font-semibold text-title">
           Personal Information
         </h2>
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="px-4 py-2 rounded-md text-base font-medium flex items-center"
-            style={{
-              backgroundColor: "var(--color-secondary)",
-              color: "white",
-            }}
+            className="px-4 py-2 rounded-md text-base font-medium flex items-center bg-secondary text-white"
           >
-            <Edit size={16} className="mr-2" />
+            <Edit className="w-4 h-4 mr-2" />
             Edit
           </button>
         )}
@@ -204,15 +180,8 @@ const PersonalInformation = () => {
           {isUpdating && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center">
-                <Loader
-                  size={40}
-                  className="animate-spin mb-4"
-                  style={{ color: "var(--color-secondary)" }}
-                />
-                <p
-                  className="text-lg font-medium"
-                  style={{ color: "var(--color-title)" }}
-                >
+                <Loader className="animate-spin mb-4 h-10 w-10 text-secondary" />
+                <p className="text-lg font-medium text-title">
                   Updating profile...
                 </p>
               </div>
@@ -221,17 +190,11 @@ const PersonalInformation = () => {
 
           {/* Photo Upload Section */}
           <div className="mb-8">
-            <label
-              className="block mb-3 text-base font-medium"
-              style={{ color: "var(--color-text)" }}
-            >
+            <label className="block mb-3 text-base font-medium text-text">
               Profile Picture
             </label>
             <div className="flex flex-col sm:flex-row items-center gap-6">
-              <div
-                className="w-32 h-32 rounded-full overflow-hidden border flex items-center justify-center"
-                style={{ borderColor: "var(--color-border)" }}
-              >
+              <div className="w-32 h-32 rounded-full overflow-hidden border border-border flex items-center justify-center">
                 {photoPreview ? (
                   <img
                     src={photoPreview}
@@ -239,7 +202,7 @@ const PersonalInformation = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User size={48} style={{ color: "var(--color-icons)" }} />
+                  <User className="w-12 h-12 text-icons" />
                 )}
               </div>
               <div className="flex flex-col gap-3">
@@ -254,32 +217,22 @@ const PersonalInformation = () => {
                 <button
                   type="button"
                   onClick={triggerFileInput}
-                  className="px-4 py-2 rounded-md text-base font-medium flex items-center"
-                  style={{
-                    backgroundColor: "var(--color-primary)",
-                    color: "var(--color-title)",
-                  }}
+                  className="px-4 py-2 rounded-md text-base font-medium flex items-center bg-primary text-title"
                 >
-                  <Upload size={16} className="mr-2" />
+                  <Upload className="w-4 h-4 mr-2" />
                   Upload Image
                 </button>
                 {photoPreview && (
                   <button
                     type="button"
                     onClick={removePhoto}
-                    className="px-4 py-2 rounded-md text-base font-medium flex items-center"
-                    style={{
-                      backgroundColor: "white",
-                      color: "var(--color-title)",
-                      border: "1px solid",
-                      borderColor: "var(--color-border)",
-                    }}
+                    className="px-4 py-2 rounded-md text-base font-medium flex items-center bg-white text-title border border-border"
                   >
-                    <X size={16} className="mr-2" />
+                    <X className="w-4 h-4 mr-2" />
                     Remove Image
                   </button>
                 )}
-                <p className="text-sm" style={{ color: "var(--color-text)" }}>
+                <p className="text-sm text-text">
                   Recommended: Square image, max size 5MB
                 </p>
               </div>
@@ -288,144 +241,85 @@ const PersonalInformation = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div>
-              <label
-                className="block mb-3 text-base font-medium"
-                style={{ color: "var(--color-text)" }}
-              >
+              <label className="block mb-3 text-base font-medium text-text">
                 Full Name
               </label>
-              <div
-                className="flex items-center p-0 rounded-md border overflow-hidden"
-                style={{ borderColor: "var(--color-border)" }}
-              >
-                <span
-                  className="flex items-center justify-center h-full px-4 py-3 border-r"
-                  style={{
-                    backgroundColor: "var(--color-primary)",
-                    borderColor: "var(--color-border)",
-                  }}
-                >
-                  <User size={20} style={{ color: "var(--color-icons)" }} />
+              <div className="flex items-center rounded-md border border-border overflow-hidden">
+                <span className="flex items-center justify-center h-full px-4 py-3 border-r border-border bg-primary">
+                  <User className="w-5 h-5 text-icons" />
                 </span>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="p-4 flex-1 w-full outline-none text-base"
-                  style={{ color: "var(--color-title)" }}
+                  className="p-4 flex-1 w-full outline-none text-base text-title"
                 />
               </div>
             </div>
             <div>
-              <label
-                className="block mb-3 text-base font-medium"
-                style={{ color: "var(--color-text)" }}
-              >
+              <label className="block mb-3 text-base font-medium text-text">
                 Email Address
               </label>
-              <div
-                className="flex items-center p-0 rounded-md border overflow-hidden"
-                style={{ borderColor: "var(--color-border)" }}
-              >
-                <span
-                  className="flex items-center justify-center h-full px-4 py-3 border-r"
-                  style={{
-                    backgroundColor: "var(--color-primary)",
-                    borderColor: "var(--color-border)",
-                  }}
-                >
-                  <Mail size={20} style={{ color: "var(--color-icons)" }} />
+              <div className="flex items-center rounded-md border border-border overflow-hidden">
+                <span className="flex items-center justify-center h-full px-4 py-3 border-r border-border bg-primary">
+                  <Mail className="w-5 h-5 text-icons" />
                 </span>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="p-4 flex-1 w-full outline-none text-base"
-                  style={{ color: "var(--color-title)" }}
+                  className="p-4 flex-1 w-full outline-none text-base text-title"
                 />
               </div>
             </div>
             <div>
-              <label
-                className="block mb-3 text-base font-medium"
-                style={{ color: "var(--color-text)" }}
-              >
+              <label className="block mb-3 text-base font-medium text-text">
                 Phone Number
               </label>
-              <div
-                className="flex items-center p-0 rounded-md border overflow-hidden"
-                style={{ borderColor: "var(--color-border)" }}
-              >
-                <span
-                  className="flex items-center justify-center h-full px-4 py-3 border-r"
-                  style={{
-                    backgroundColor: "var(--color-primary)",
-                    borderColor: "var(--color-border)",
-                  }}
-                >
-                  <Phone size={20} style={{ color: "var(--color-icons)" }} />
+              <div className="flex items-center rounded-md border border-border overflow-hidden">
+                <span className="flex items-center justify-center h-full px-4 py-3 border-r border-border bg-primary">
+                  <Phone className="w-5 h-5 text-icons" />
                 </span>
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone || ""}
                   onChange={handleInputChange}
-                  className="p-4 flex-1 w-full outline-none text-base"
-                  style={{ color: "var(--color-title)" }}
+                  className="p-4 flex-1 w-full outline-none text-base text-title"
                 />
               </div>
             </div>
             <div>
-              <label
-                className="block mb-3 text-base font-medium"
-                style={{ color: "var(--color-text)" }}
-              >
+              <label className="block mb-3 text-base font-medium text-text">
                 Address
               </label>
-              <div
-                className="flex items-center p-0 rounded-md border overflow-hidden"
-                style={{ borderColor: "var(--color-border)" }}
-              >
-                <span
-                  className="flex items-center justify-center h-full px-4 py-3 border-r"
-                  style={{
-                    backgroundColor: "var(--color-primary)",
-                    borderColor: "var(--color-border)",
-                  }}
-                >
-                  <MapPin size={20} style={{ color: "var(--color-icons)" }} />
+              <div className="flex items-center rounded-md border border-border overflow-hidden">
+                <span className="flex items-center justify-center h-full px-4 py-3 border-r border-border bg-primary">
+                  <MapPin className="w-5 h-5 text-icons" />
                 </span>
                 <input
                   type="text"
                   name="address"
                   value={formData.address || ""}
                   onChange={handleInputChange}
-                  className="p-4 flex-1 w-full outline-none text-base"
-                  style={{ color: "var(--color-title)" }}
+                  className="p-4 flex-1 w-full outline-none text-base text-title"
                 />
               </div>
             </div>
           </div>
 
-          <div
-            className="flex space-x-4 pt-6 border-t"
-            style={{ borderColor: "var(--color-border)" }}
-          >
+          <div className="flex space-x-4 pt-6 border-t border-border">
             <button
               type="submit"
-              className="px-6 py-3 rounded-md text-base font-medium flex items-center"
-              style={{
-                backgroundColor: "var(--color-secondary)",
-                color: "white",
-              }}
+              className="px-6 py-3 rounded-md text-base font-medium flex items-center bg-secondary text-white disabled:opacity-70 disabled:cursor-not-allowed"
               disabled={isUpdating}
             >
               {isUpdating ? (
-                <Loader size={18} className="animate-spin mr-2" />
+                <Loader className="animate-spin w-4 h-4 mr-2" />
               ) : (
-                <Save size={18} className="mr-2" />
+                <Save className="w-4 h-4 mr-2" />
               )}
               Save Changes
             </button>
@@ -433,7 +327,6 @@ const PersonalInformation = () => {
               type="button"
               onClick={() => {
                 setIsEditing(false);
-                // Reset form to current user data
                 if (user) {
                   setFormData({
                     name: user.name || "",
@@ -448,16 +341,10 @@ const PersonalInformation = () => {
                   fileInputRef.current.value = "";
                 }
               }}
-              className="px-6 py-3 rounded-md text-base font-medium flex items-center"
-              style={{
-                backgroundColor: "white",
-                color: "var(--color-title)",
-                border: "1px solid",
-                borderColor: "var(--color-border)",
-              }}
+              className="px-6 py-3 rounded-md text-base font-medium flex items-center bg-white text-title border border-border disabled:opacity-70 disabled:cursor-not-allowed"
               disabled={isUpdating}
             >
-              <X size={18} className="mr-2" />
+              <X className="w-4 h-4 mr-2" />
               Cancel
             </button>
           </div>
@@ -465,14 +352,8 @@ const PersonalInformation = () => {
       ) : (
         <div className="space-y-8">
           {/* Photo Display (View Mode) */}
-          <div
-            className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b"
-            style={{ borderColor: "var(--color-border)" }}
-          >
-            <div
-              className="w-32 h-32 rounded-full overflow-hidden border flex items-center justify-center"
-              style={{ borderColor: "var(--color-border)" }}
-            >
+          <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-border">
+            <div className="w-32 h-32 rounded-full overflow-hidden border border-border flex items-center justify-center">
               {user?.photo ? (
                 <img
                   src={user.photo}
@@ -480,17 +361,14 @@ const PersonalInformation = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <User size={48} style={{ color: "var(--color-icons)" }} />
+                <User className="w-12 h-12 text-icons" />
               )}
             </div>
             <div>
-              <h3
-                className="text-xl font-medium"
-                style={{ color: "var(--color-title)" }}
-              >
+              <h3 className="text-xl font-medium text-title">
                 {user?.name || "User Name"}
               </h3>
-              <p className="text-base" style={{ color: "var(--color-text)" }}>
+              <p className="text-base text-text">
                 {user?.email || "user@example.com"}
               </p>
             </div>
@@ -498,97 +376,45 @@ const PersonalInformation = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <label
-                className="block mb-3 text-base font-medium"
-                style={{ color: "var(--color-text)" }}
-              >
+              <label className="block mb-3 text-base font-medium text-text">
                 Full Name
               </label>
-              <div
-                className="flex items-center p-4 rounded-md border"
-                style={{ borderColor: "var(--color-border)" }}
-              >
-                <User
-                  size={20}
-                  style={{ color: "var(--color-icons)" }}
-                  className="mr-3"
-                />
-                <span
-                  className="text-base"
-                  style={{ color: "var(--color-title)" }}
-                >
+              <div className="flex items-center p-4 rounded-md border border-border">
+                <User className="w-5 h-5 text-icons mr-3" />
+                <span className="text-base text-title">
                   {user?.name || "User Name"}
                 </span>
               </div>
             </div>
             <div>
-              <label
-                className="block mb-3 text-base font-medium"
-                style={{ color: "var(--color-text)" }}
-              >
+              <label className="block mb-3 text-base font-medium text-text">
                 Email Address
               </label>
-              <div
-                className="flex items-center p-4 rounded-md border"
-                style={{ borderColor: "var(--color-border)" }}
-              >
-                <Mail
-                  size={20}
-                  style={{ color: "var(--color-icons)" }}
-                  className="mr-3"
-                />
-                <span
-                  className="text-base"
-                  style={{ color: "var(--color-title)" }}
-                >
+              <div className="flex items-center p-4 rounded-md border border-border">
+                <Mail className="w-5 h-5 text-icons mr-3" />
+                <span className="text-base text-title">
                   {user?.email || "user@example.com"}
                 </span>
               </div>
             </div>
             <div>
-              <label
-                className="block mb-3 text-base font-medium"
-                style={{ color: "var(--color-text)" }}
-              >
+              <label className="block mb-3 text-base font-medium text-text">
                 Phone Number
               </label>
-              <div
-                className="flex items-center p-4 rounded-md border"
-                style={{ borderColor: "var(--color-border)" }}
-              >
-                <Phone
-                  size={20}
-                  style={{ color: "var(--color-icons)" }}
-                  className="mr-3"
-                />
-                <span
-                  className="text-base"
-                  style={{ color: "var(--color-title)" }}
-                >
+              <div className="flex items-center p-4 rounded-md border border-border">
+                <Phone className="w-5 h-5 text-icons mr-3" />
+                <span className="text-base text-title">
                   {user?.phone || "+1 (555) 123-4567"}
                 </span>
               </div>
             </div>
             <div>
-              <label
-                className="block mb-3 text-base font-medium"
-                style={{ color: "var(--color-text)" }}
-              >
+              <label className="block mb-3 text-base font-medium text-text">
                 Address
               </label>
-              <div
-                className="flex items-center p-4 rounded-md border"
-                style={{ borderColor: "var(--color-border)" }}
-              >
-                <MapPin
-                  size={20}
-                  style={{ color: "var(--color-icons)" }}
-                  className="mr-3"
-                />
-                <span
-                  className="text-base"
-                  style={{ color: "var(--color-title)" }}
-                >
+              <div className="flex items-center p-4 rounded-md border border-border">
+                <MapPin className="w-5 h-5 text-icons mr-3" />
+                <span className="text-base text-title">
                   {user?.address || "123 Main St, City, State 12345"}
                 </span>
               </div>
