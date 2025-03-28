@@ -24,6 +24,8 @@ import Wishlist from "./components/profilePage/wishlist";
 //Admin Page
 import Dashboard from "./components/adminPage/Dashboard";
 import Customers from "./components/adminPage/Customers";
+import Products from "./components/adminPage/Products";
+import EditUser from "./components/adminPage/customers/editUser";
 
 const router = createBrowserRouter([
   {
@@ -97,12 +99,26 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        path: "/admin",
+        path: "/admin/dashboard",
         element: <Dashboard />,
       },
       {
         path: "/admin/customers",
         element: <Customers />,
+      },
+      {
+        path: "/admin/users/edit/:userId",
+        element: <EditUser />,
+      },
+      {
+        path: "/admin/products",
+        element: <Products />,
+        // children: [
+        //   {
+        //     path: "/admin",
+        //     element: <Dashboard />,
+        //   },
+        // ],
       },
     ],
   },

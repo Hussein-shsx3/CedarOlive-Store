@@ -69,7 +69,7 @@ const AdminDashboard = () => {
     {
       icon: <LayoutDashboard className="w-5 h-5" />,
       label: "Dashboard",
-      to: "/admin",
+      to: "/admin/dashboard",
     },
     {
       icon: <Package className="w-5 h-5" />,

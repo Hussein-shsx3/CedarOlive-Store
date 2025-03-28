@@ -38,7 +38,7 @@ const CustomerDeleteAlert = ({ onConfirm, userName, userId }) => {
     <>
       <button
         onClick={handleClickOpen}
-        className="text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors"
+        className="text-red-700 hover:bg-red-50 p-2 rounded-full transition-colors"
         aria-label={`Delete user ${userName}`}
       >
         <Trash2 className="w-5 h-5" />
@@ -175,7 +175,6 @@ const Customers = () => {
         </div>
       </div>
 
-      {/* Table View for larger screens */}
       <div className="hidden sm:block">
         <div className="bg-white rounded-lg shadow-md overflow-x-auto">
           <table className="w-full text-left min-w-[600px]">
