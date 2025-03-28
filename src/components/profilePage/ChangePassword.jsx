@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { updatePassword } from "../../api/users/userApi";
 import { Lock, EyeOff, Eye, Loader2 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const ChangePassword = () => {
   const [passwordData, setPasswordData] = useState({

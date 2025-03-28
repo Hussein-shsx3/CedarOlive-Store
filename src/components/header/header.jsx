@@ -42,6 +42,7 @@ const Header = () => {
     { title: "My Orders", path: "/profile/orders" },
     { title: "Wishlist", path: "/profile/wishlist" },
     { title: "Payment", path: "/profile/payment" },
+    { title: "Settings", path: "/profile/settings" },
   ];
 
   // Toggle functions remain the same

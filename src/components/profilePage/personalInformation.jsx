@@ -16,7 +16,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useOutletContext } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 

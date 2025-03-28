@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const EditUserPage = () => {
   const { userId } = useParams();
