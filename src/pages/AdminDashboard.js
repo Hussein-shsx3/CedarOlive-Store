@@ -5,13 +5,12 @@ import {
   Package,
   Users,
   Settings,
-  Search,
-  ChevronDown,
   Bell,
   Menu,
   X,
   LogOut,
   User,
+  ChevronDown,
 } from "lucide-react";
 import { Link, Outlet, NavLink, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,7 +22,6 @@ const AdminDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const profileDropdownRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -97,15 +95,6 @@ const AdminDashboard = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    console.log("Searching for:", searchQuery);
-  };
-
   const handleLogout = () => {
     dispatch(logout());
     navigate("/signIn");
@@ -113,53 +102,40 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex h-screen bg-[#f7f3f3] text-[#131313] overflow-hidden">
+      {/* Mobile Header */}
       <div className="fixed top-0 left-0 right-0 bg-white shadow-md md:hidden z-40">
-        <div className="flex flex-col">
-          <div className="flex justify-between items-center p-4">
-            <div className="flex items-center">
-              <button
-                onClick={toggleMobileMenu}
-                className="mr-4 text-[#6b7280] hover:text-[#A0522D]"
-              >
-                <Menu className="w-6 h-6" />
-              </button>
-              <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-                {user?.photo ? (
-                  <img
-                    src={user.photo}
-                    alt="User"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <User size={64} className="text-icons p-2" />
-                )}
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button className="relative text-[#6b7280] hover:text-[#A0522D]">
-                <Bell className="w-5 h-5" />
-                <span className="absolute -top-2 -right-2 bg-[#A0522D] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  3
-                </span>
-              </button>
+        <div className="flex justify-between items-center p-4">
+          <div className="flex items-center">
+            <button
+              onClick={toggleMobileMenu}
+              className="mr-4 text-[#6b7280] hover:text-[#A0522D]"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+              {user?.photo ? (
+                <img
+                  src={user.photo}
+                  alt="User"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User size={64} className="text-icons p-2" />
+              )}
             </div>
           </div>
-
-          <form onSubmit={handleSearchSubmit} className="px-4 pb-4">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                className="w-full pl-10 pr-4 py-2 border border-[#e2e8f0] rounded-full text-sm text-[#8a8888] focus:outline-none focus:ring-2 focus:ring-[#A0522D]/50"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280] w-5 h-5" />
-            </div>
-          </form>
+          <div className="flex items-center space-x-4">
+            <button className="relative text-[#6b7280] hover:text-[#A0522D]">
+              <Bell className="w-5 h-5" />
+              <span className="absolute -top-2 -right-2 bg-[#A0522D] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                3
+              </span>
+            </button>
+          </div>
         </div>
       </div>
 
+      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -240,6 +216,7 @@ const AdminDashboard = () => {
         )}
       </AnimatePresence>
 
+      {/* Desktop Sidebar */}
       <div
         className={`${
           isSidebarOpen ? "w-64" : "w-20"
@@ -285,22 +262,10 @@ const AdminDashboard = () => {
         </nav>
       </div>
 
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="hidden md:flex bg-white shadow-md border-b border-[#e2e8f0] px-6 py-4 justify-between items-center">
-          <form
-            onSubmit={handleSearchSubmit}
-            className="relative flex-grow max-w-md mr-6"
-          >
-            <input
-              type="text"
-              placeholder="Search products, orders, customers..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="w-full pl-10 pr-4 py-2 border border-[#e2e8f0] rounded-full text-sm text-[#8a8888] focus:outline-none focus:ring-2 focus:ring-[#A0522D]/50"
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280] w-5 h-5" />
-          </form>
-
+        {/* Desktop Header */}
+        <header className="hidden md:flex bg-white shadow-md border-b border-[#e2e8f0] px-6 py-4 justify-end items-center">
           <div className="flex items-center space-x-4">
             <button className="relative text-[#6b7280] hover:text-[#A0522D]">
               <Bell className="w-5 h-5" />
@@ -354,7 +319,8 @@ const AdminDashboard = () => {
           </div>
         </header>
 
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#f7f3f3] p-4 md:p-6 mt-16 md:mt-0">
+        {/* Main Content */}
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#f7f3f3] p-2 md:p-6 mt-16 md:mt-0">
           <Outlet />
         </main>
       </div>

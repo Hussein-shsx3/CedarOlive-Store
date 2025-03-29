@@ -45,6 +45,11 @@ const Header = () => {
     { title: "Settings", path: "/profile/settings" },
   ];
 
+  // Add Admin link to profile links for admin users
+  if (user && user.role === "admin") {
+    profileLinks.unshift({ title: "Admin Dashboard", path: "/admin" });
+  }
+
   // Toggle functions remain the same
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
@@ -132,6 +137,13 @@ const Header = () => {
     }
   };
 
+  // Direct navigation to admin dashboard
+  const goToAdminDashboard = () => {
+    navigate("/admin");
+    setIsProfileOpen(false);
+    setIsMenuOpen(false);
+  };
+
   return (
     <div className="w-full sticky top-0 z-50">
       {/* Search Overlay */}
@@ -210,6 +222,36 @@ const Header = () => {
               ))}
             </nav>
             <div className="flex items-center space-x-4">
+              {/* Admin Button - Desktop */}
+              {user && user.role === "admin" && (
+                <Link
+                  to="/admin"
+                  className="hidden md:flex items-center px-3 py-2 bg-secondary text-white rounded-md hover:bg-[#9a4a25] transition-colors duration-300 border border-secondary"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  <span className="text-sm font-medium">Admin</span>
+                </Link>
+              )}
+
               <button
                 className="p-1 hover:text-secondary transition duration-200"
                 onClick={toggleSearch}
@@ -249,6 +291,12 @@ const Header = () => {
                           <User size={64} className="text-icons p-2" />
                         )}
                       </div>
+                      {/* Admin badge for mobile - shown next to profile photo */}
+                      {user.role === "admin" && (
+                        <span className="md:hidden flex items-center justify-center absolute -top-1 -right-1 bg-secondary text-white text-[10px] w-5 h-5 rounded-full">
+                          A
+                        </span>
+                      )}
                     </button>
 
                     <div
@@ -261,7 +309,42 @@ const Header = () => {
                       <div className="p-3 border-b">
                         <p className="font-medium">{user.name}</p>
                         <p className="text-sm text-gray-500">{user.email}</p>
+                        {user.role === "admin" && (
+                          <span className="inline-block bg-secondary text-white text-xs px-2 py-1 rounded-sm mt-1">
+                            Admin
+                          </span>
+                        )}
                       </div>
+                      {user.role === "admin" && (
+                        <div className="p-3 border-b">
+                          <button
+                            onClick={goToAdminDashboard}
+                            className="w-full flex items-center justify-center py-2 bg-secondary text-white rounded hover:bg-[#9a4a25] transition-colors duration-300"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4 mr-2"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                            </svg>
+                            Admin Dashboard
+                          </button>
+                        </div>
+                      )}
                       <div className="py-1">
                         {profileLinks.map((link) => (
                           <Link
@@ -462,10 +545,41 @@ const Header = () => {
       {/* Mobile Menu */}
       <div
         className={`md:hidden bg-white w-full shadow-md transition-all duration-300 ease-in-out overflow-hidden ${
-          isMenuOpen ? "max-h-[400px] py-4" : "max-h-0"
+          isMenuOpen ? "max-h-[500px] py-4" : "max-h-0"
         }`}
       >
         <div className="container mx-auto px-5">
+          {/* Admin Button for Mobile - Prominent at the top of mobile menu */}
+          {user && user.role === "admin" && (
+            <div className="mb-4 pb-4 border-b border-gray-100">
+              <button
+                onClick={goToAdminDashboard}
+                className="flex items-center justify-center w-full py-3 px-4 bg-secondary text-white rounded-md hover:bg-[#9a4a25] transition-colors duration-300"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <span className="font-medium">Admin Dashboard</span>
+              </button>
+            </div>
+          )}
           <nav className="flex flex-col space-y-4">
             {[...categoryLinks, ...navLinks].map((link) => (
               <Link

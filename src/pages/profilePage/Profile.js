@@ -6,7 +6,6 @@ import { useNavigate, Outlet, Link, useLocation } from "react-router-dom"; // Im
 import Cookies from "universal-cookie";
 import {
   Camera,
-  Edit,
   Package,
   CreditCard,
   Heart,
@@ -116,43 +115,32 @@ const Profile = () => {
                 </button>
               </div>
 
-              <div className="flex-1 text-center md:text-left">
-                <h1
-                  className="text-3xl font-bold mb-1"
-                  style={{ color: "var(--color-title)" }}
-                >
-                  {user?.name || "User Name"}
-                </h1>
-                <p
-                  className="text-lg mb-4"
-                  style={{ color: "var(--color-text)" }}
-                >
-                  {user?.email || "user@example.com"}
-                </p>
-                <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                  <Link
-                    to="/profile"
-                    className="px-5 py-2 rounded-md text-base font-medium shadow-sm flex items-center"
-                    style={{
-                      backgroundColor: "var(--color-secondary)",
-                      color: "white",
-                    }}
+              <div className="w-full flex text-center md:text-left flex-wrap lg:flex-row justify-between">
+                <div>
+                  <h1
+                    className="text-3xl font-bold mb-1"
+                    style={{ color: "var(--color-title)" }}
                   >
-                    <Edit size={18} className="mr-2" />
-                    Edit Profile
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="px-5 py-2 rounded-md text-base font-medium shadow-sm flex items-center bg-white hover:text-white hover:bg-secondary transition-all duration-200"
-                    style={{
-                      border: "1px solid",
-                      borderColor: "var(--color-border)",
-                    }}
+                    {user?.name || "User Name"}
+                  </h1>
+                  <p
+                    className="text-lg mb-4"
+                    style={{ color: "var(--color-text)" }}
                   >
-                    <LogOut size={18} className="mr-2" />
-                    Logout
-                  </button>
+                    {user?.email || "user@example.com"}
+                  </p>
                 </div>
+                <button
+                  onClick={handleLogout}
+                  className="w-[120px] h-[50px] justify-center rounded-md text-base font-medium shadow-sm flex items-center bg-white hover:text-white hover:bg-secondary transition-all duration-200"
+                  style={{
+                    border: "1px solid",
+                    borderColor: "var(--color-border)",
+                  }}
+                >
+                  <LogOut size={18} className="mr-2" />
+                  Logout
+                </button>
               </div>
             </div>
           </div>

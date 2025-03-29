@@ -7,37 +7,41 @@ const Products = () => {
   const [activeTab, setActiveTab] = useState("list");
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex mb-6 bg-[#ede5de] rounded-lg">
+    <div className="container mx-auto px-4 py-4 md:py-8">
+      {/* Responsive Navigation Tabs */}
+      <div className="flex flex-col sm:flex-row mb-6 bg-[#ede5de] rounded-lg overflow-hidden">
         <button
           onClick={() => setActiveTab("list")}
-          className={`flex-1 flex items-center justify-center py-3 transition-colors ${
+          className={`flex items-center justify-center py-3 px-4 transition-colors ${
             activeTab === "list"
               ? "bg-[#A0522D] text-white"
               : "text-[#8a8888] hover:bg-[#A0522D]/10"
           }`}
         >
-          <List className="mr-2" /> All Products
+          <List className="mr-2 h-5 w-5" />
+          <span className="text-sm md:text-base">All Products</span>
         </button>
         <button
           onClick={() => setActiveTab("add")}
-          className={`flex-1 flex items-center justify-center py-3 transition-colors ${
+          className={`flex items-center justify-center py-3 px-4 transition-colors ${
             activeTab === "add"
               ? "bg-[#A0522D] text-white"
               : "text-[#8a8888] hover:bg-[#A0522D]/10"
           }`}
         >
-          <PlusCircle className="mr-2" /> Add Product
+          <PlusCircle className="mr-2 h-5 w-5" />
+          <span className="text-sm md:text-base">Add Product</span>
         </button>
         <button
           onClick={() => setActiveTab("import")}
-          className={`flex-1 flex items-center justify-center py-3 transition-colors ${
+          className={`flex items-center justify-center py-3 px-4 transition-colors ${
             activeTab === "import"
               ? "bg-[#A0522D] text-white"
               : "text-[#8a8888] hover:bg-[#A0522D]/10"
           }`}
         >
-          <FileText className="mr-2" /> Import Products
+          <FileText className="mr-2 h-5 w-5" />
+          <span className="text-sm md:text-base">Import Products</span>
         </button>
       </div>
 
