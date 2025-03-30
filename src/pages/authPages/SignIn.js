@@ -1,8 +1,10 @@
-// src/components/SignIn.js
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signIn } from "../../api/auth/authApi";
+
+// Create a memoized selector for better Redux performance
+const selectAuthError = (state) => state.auth.error;
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
@@ -14,22 +16,12 @@ const SignIn = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { error } = useSelector((state) => state.auth);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
+  // Use memoized selector to prevent unnecessary re-renders
+  const error = useSelector(selectAuthError);
 
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  const validate = () => {
+  // Memoize the validation function to prevent recreation on each render
+  const validate = useCallback(() => {
     const newErrors = {};
 
     // Email validation
@@ -47,82 +39,160 @@ const SignIn = () => {
     }
 
     return newErrors;
-  };
+  }, [formData.email, formData.password]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Memoize the change handler to prevent recreation on each render
+  const handleChange = useCallback((e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: type === "checkbox" ? checked : value,
+    }));
 
-    // Validate form data
-    const formValidation = validate();
-    if (Object.keys(formValidation).length > 0) {
-      setErrors(formValidation);
-      return;
-    }
+    // Clear error when user starts typing
+    setErrors((prevErrors) => {
+      if (prevErrors[name]) {
+        return { ...prevErrors, [name]: "" };
+      }
+      return prevErrors;
+    });
+  }, []);
 
-    setIsSubmitting(true);
+  // Memoize the submit handler
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
 
-    try {
-      await dispatch(signIn(formData)).unwrap();
-      navigate("/");
-    } catch (error) {
-      setErrors({ general: error.message });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+      // Validate form data
+      const formValidation = validate();
+      if (Object.keys(formValidation).length > 0) {
+        setErrors(formValidation);
+        return;
+      }
 
-  const handleForgotPassword = () => {
+      setIsSubmitting(true);
+
+      try {
+        await dispatch(signIn(formData)).unwrap();
+        navigate("/");
+      } catch (error) {
+        setErrors({ general: error.message });
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [dispatch, formData, navigate, validate]
+  );
+
+  // Memoize the forgot password handler
+  const handleForgotPassword = useCallback(() => {
     navigate("/forgot-password");
-  };
+  }, [navigate]);
 
-  // Helper function for form control props
-  const getFormControlProps = (fieldName) => ({
-    disabled: isSubmitting,
-    name: fieldName,
-    id: fieldName,
-    value: formData[fieldName],
-    onChange: handleChange,
-    className: `appearance-none block w-full px-3 py-2 border ${
-      errors[fieldName] ? "border-red-300" : "border-gray-300"
-    } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm ${
-      isSubmitting ? "bg-gray-100" : ""
-    }`,
-  });
+  // Memoize form control props to prevent recreation on each render
+  const getFormControlProps = useCallback(
+    (fieldName) => ({
+      disabled: isSubmitting,
+      name: fieldName,
+      id: fieldName,
+      value: formData[fieldName],
+      onChange: handleChange,
+      className: `appearance-none block w-full px-3 py-2 border ${
+        errors[fieldName] ? "border-red-300" : "border-gray-300"
+      } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm ${
+        isSubmitting ? "bg-gray-100" : ""
+      }`,
+    }),
+    [formData, errors, isSubmitting, handleChange]
+  );
+
+  // Memoize loading overlay to prevent recreation
+  const loadingOverlay = useMemo(() => {
+    if (!isSubmitting) return null;
+
+    return (
+      <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10 rounded-lg">
+        <div className="text-center">
+          <svg
+            className="animate-spin h-8 w-8 mx-auto text-secondary"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <p className="mt-2 text-sm font-medium text-secondary">
+            Signing in...
+          </p>
+        </div>
+      </div>
+    );
+  }, [isSubmitting]);
+
+  // Memoize error message component
+  const errorMessage = useMemo(() => {
+    if (!errors.general && !error) return null;
+
+    return (
+      <div
+        className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
+        role="alert"
+      >
+        <span className="block sm:inline">{errors.general || error}</span>
+      </div>
+    );
+  }, [errors.general, error]);
+
+  // Memoize submit button content
+  const submitButtonContent = useMemo(() => {
+    if (isSubmitting) {
+      return (
+        <span className="flex items-center justify-center">
+          <svg
+            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          Signing in...
+        </span>
+      );
+    }
+    return "Sign in";
+  }, [isSubmitting]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 relative">
           {/* Form Loading Overlay */}
-          {isSubmitting && (
-            <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10 rounded-lg">
-              <div className="text-center">
-                <svg
-                  className="animate-spin h-8 w-8 mx-auto text-secondary"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                <p className="mt-2 text-sm font-medium text-secondary">
-                  Signing in...
-                </p>
-              </div>
-            </div>
-          )}
+          {loadingOverlay}
 
           <div className="sm:mx-auto sm:w-full sm:max-w-md mb-9">
             <Link to="/" className="flex justify-center">
@@ -136,14 +206,8 @@ const SignIn = () => {
               Sign in to your account
             </h2>
           </div>
-          {(errors.general || error) && (
-            <div
-              className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
-              role="alert"
-            >
-              <span className="block sm:inline">{errors.general || error}</span>
-            </div>
-          )}
+
+          {errorMessage}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
@@ -223,33 +287,7 @@ const SignIn = () => {
                 disabled={isSubmitting}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-secondary hover:bg-[#aa7b5a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? (
-                  <span className="flex items-center justify-center">
-                    <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Signing in...
-                  </span>
-                ) : (
-                  "Sign in"
-                )}
+                {submitButtonContent}
               </button>
             </div>
             <p className="text-center mt-6 text-[#8a8888] text-sm">
@@ -270,4 +308,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default React.memo(SignIn);
