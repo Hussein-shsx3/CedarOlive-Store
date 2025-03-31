@@ -12,7 +12,7 @@ import {
   User,
   ChevronDown,
 } from "lucide-react";
-import { Link, Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Link, Outlet, NavLink, useNavigate, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGetCurrentUser } from "../api/users/userApi";
 import { logout } from "../redux/authSlice";
@@ -63,6 +63,7 @@ const AdminDashboard = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Updated NavItems to use /admin/dashboard instead of /admin
   const NavItems = [
     {
       icon: <LayoutDashboard className="w-5 h-5" />,
@@ -99,6 +100,12 @@ const AdminDashboard = () => {
     dispatch(logout());
     navigate("/signIn");
   };
+
+  // This checks if we're at the root /admin route and redirects to /admin/dashboard
+  const pathname = window.location.pathname;
+  if (pathname === "/admin") {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
 
   return (
     <div className="flex h-screen bg-[#f7f3f3] text-[#131313] overflow-hidden">
@@ -147,7 +154,7 @@ const AdminDashboard = () => {
           >
             <div className="h-full flex flex-col">
               <div className="flex justify-between items-center p-4 border-b border-[#e2e8f0]">
-                <Link to="/">
+                <Link to="/admin/dashboard">
                   <img
                     src="https://cdn.prod.website-files.com/629f3db942b81a5f49ac7ba9/62c4923d2a7ada5125407697_logo.svg"
                     alt="Logo"
@@ -220,11 +227,11 @@ const AdminDashboard = () => {
       <div
         className={`${
           isSidebarOpen ? "w-64" : "w-20"
-        } bg-[#ede5de] transition-all duration-300 ease-in-out border-r border-[#e2e8f0] flex flex-col shadow-lg hidden md:flex`}
+        } bg-[#ede5de] transition-all duration-300 ease-in-out border-r border-[#e2e8f0] shadow-lg md:block hidden`}
       >
         <div className="flex items-center justify-between p-4 border-b border-[#e2e8f0]">
           {isSidebarOpen && (
-            <Link to="/">
+            <Link to="/admin/dashboard">
               <img
                 src="https://cdn.prod.website-files.com/629f3db942b81a5f49ac7ba9/62c4923d2a7ada5125407697_logo.svg"
                 alt="Logo"

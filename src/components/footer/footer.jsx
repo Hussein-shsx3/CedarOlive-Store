@@ -145,7 +145,7 @@ const Footer = () => {
       </div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-gray-400 w-full">
         <div>
-          ©2022 Company | Designed by{" "}
+          ©2025 Company | Designed by{" "}
           <a
             href="https://obenocci.com"
             target="_blank"

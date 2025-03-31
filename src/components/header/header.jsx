@@ -6,14 +6,15 @@ import { useGetCurrentUser } from "../../api/users/userApi";
 import { logout } from "../../redux/authSlice";
 import { removeFromCart, clearCart } from "../../redux/cartSlice";
 import { User } from "lucide-react";
-import { toast } from "react-toastify"; // Make sure to import toast
+import { toast } from "react-toastify";
+import { products } from "../../data";
+import SearchOverlay from "./SearchOverlay"; // Import the SearchOverlay component
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
@@ -50,7 +51,7 @@ const Header = () => {
     profileLinks.unshift({ title: "Admin Dashboard", path: "/admin" });
   }
 
-  // Toggle functions remain the same
+  // Toggle functions
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
     if (isMenuOpen) setIsMenuOpen(false);
@@ -79,15 +80,6 @@ const Header = () => {
   const handleClearCart = () => {
     dispatch(clearCart());
     setIsCartOpen(false);
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      setIsSearchOpen(false);
-      navigate(`/shop/${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery("");
-    }
   };
 
   const handleLogout = () => {
@@ -146,49 +138,12 @@ const Header = () => {
 
   return (
     <div className="w-full sticky top-0 z-50">
-      {/* Search Overlay */}
-      <div
-        className={`w-full bg-white shadow-md transition-all duration-300 ease-in-out absolute top-16 left-0 right-0 overflow-hidden ${
-          isSearchOpen ? "max-h-24" : "max-h-0"
-        }`}
-      >
-        <div className="container mx-auto px-4 py-4">
-          <form onSubmit={handleSearch} className="flex items-center">
-            <input
-              type="text"
-              placeholder="Search for products..."
-              className="flex-grow p-2 border border-gray-300 focus:outline-none focus:border-secondary"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              autoFocus={isSearchOpen}
-            />
-            <button
-              type="submit"
-              className="bg-secondary text-white px-6 py-2 ml-2 hover:bg-[#aa7b5a] transition duration-200"
-            >
-              Search
-            </button>
-            <button
-              type="button"
-              className="ml-2 p-2 text-gray-500 hover:text-black"
-              onClick={toggleSearch}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </form>
-        </div>
-      </div>
+      {/* Use the SearchOverlay component */}
+      <SearchOverlay
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        products={products}
+      />
 
       <header className="w-full bg-background shadow-sm py-4">
         <div className="container mx-auto px-4">

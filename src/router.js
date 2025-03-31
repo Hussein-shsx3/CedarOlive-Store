@@ -1,9 +1,8 @@
 import React from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom"; 
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import Product from "./pages/Product";
-
 import About from "./pages/About";
 import Blog from "./pages/Blog";
 import SignUp from "./pages/authPages/SignUp";
@@ -17,7 +16,7 @@ import ResetPassword from "./pages/authPages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import PrivateRoute from "./components/Protected/PrivateRoute";
 
-//Profile Page
+// Profile Page
 import Profile from "./pages/profilePage/Profile";
 import PersonalInformation from "./components/profilePage/personalInformation";
 import Wishlist from "./components/profilePage/wishlist";
@@ -25,7 +24,7 @@ import Orders from "./components/profilePage/orders";
 import Payment from "./components/profilePage/payment";
 import ChangePassword from "./components/profilePage/ChangePassword";
 
-//Admin Page
+// Admin Page
 import Dashboard from "./components/adminPage/Dashboard";
 import Customers from "./components/adminPage/Customers";
 import Products from "./components/adminPage/Products";
@@ -103,26 +102,28 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        path: "/admin/dashboard",
+        index: true,
+        element: <Navigate to="/admin/dashboard" replace />,
+      },
+      {
+        path: "dashboard",
         element: <Dashboard />,
       },
       {
-        path: "/admin/customers",
+        path: "customers",
         element: <Customers />,
       },
       {
-        path: "/admin/users/edit/:userId",
+        path: "users/edit/:userId",
         element: <EditUser />,
       },
       {
-        path: "/admin/products",
+        path: "products",
         element: <Products />,
-        // children: [
-        //   {
-        //     path: "/admin",
-        //     element: <Dashboard />,
-        //   },
-        // ],
+      },
+      {
+        path: "orders",
+        element: <Orders />,
       },
     ],
   },
