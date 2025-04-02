@@ -1,5 +1,5 @@
 import React from "react";
-import { createBrowserRouter, Navigate } from "react-router-dom"; 
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import Product from "./pages/Product";
@@ -29,6 +29,8 @@ import Dashboard from "./components/adminPage/Dashboard";
 import Customers from "./components/adminPage/Customers";
 import Products from "./components/adminPage/Products";
 import EditUser from "./components/adminPage/customers/editUser";
+import ContactMessages from "./components/adminPage/ContactMessages";
+
 
 const router = createBrowserRouter([
   {
@@ -120,6 +122,10 @@ const router = createBrowserRouter([
       {
         path: "products",
         element: <Products />,
+      },
+      {
+        path: "contactMessages",
+        element: <ContactMessages />,
       },
       {
         path: "orders",

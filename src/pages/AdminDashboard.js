@@ -11,6 +11,7 @@ import {
   LogOut,
   User,
   ChevronDown,
+  Mail,
 } from "lucide-react";
 import { Link, Outlet, NavLink, useNavigate, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -63,7 +64,6 @@ const AdminDashboard = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Updated NavItems to use /admin/dashboard instead of /admin
   const NavItems = [
     {
       icon: <LayoutDashboard className="w-5 h-5" />,
@@ -84,6 +84,11 @@ const AdminDashboard = () => {
       icon: <Users className="w-5 h-5" />,
       label: "Customers",
       to: "/admin/customers",
+    },
+    {
+      icon: <Mail className="w-5 h-5" />, // Add this contact nav item
+      label: "Contact",
+      to: "/admin/contactMessages",
     },
     {
       icon: <Settings className="w-5 h-5" />,

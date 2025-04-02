@@ -3,6 +3,7 @@ import cartSlice from "./redux/cartSlice";
 import authSlice from "./redux/authSlice";
 import userSlice from "./redux/userSlice";
 import contactSlice from "./redux/contactSlice";
+import productSlice from "./redux/productSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,5 +11,6 @@ export const store = configureStore({
     auth: authSlice,
     user: userSlice,
     contact: contactSlice,
+    product: productSlice,
   },
 });

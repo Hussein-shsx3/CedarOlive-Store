@@ -8,10 +8,9 @@ const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true, // Enable sending/receiving cookies
+  withCredentials: true, 
 });
 
-// Add request interceptor to include JWT token from localStorage
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -20,24 +19,20 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Helper function to handle API POST requests
 const apiPost = async (url, data) => {
   const response = await apiClient.post(url, data);
   return response.data;
 };
 
-// Helper function to handle API PATCH requests
 const apiPatch = async (url, data) => {
   const response = await apiClient.patch(url, data);
   return response.data;
 };
 
-// Helper function to extract error messages
 const extractErrorMessage = (error, defaultMsg) => {
   return error.response?.data?.message || error.message || defaultMsg;
 };
 
-// Sign up a new user
 export const signUp = createAsyncThunk(
   "auth/signUp",
   async (userData, { rejectWithValue }) => {
@@ -51,13 +46,12 @@ export const signUp = createAsyncThunk(
   }
 );
 
-// Sign in an existing user
 export const signIn = createAsyncThunk(
   "auth/signIn",
   async (userData, { rejectWithValue }) => {
     try {
       const response = await apiPost("/login", userData);
-      localStorage.setItem("token", response.token); // Store the token
+      localStorage.setItem("token", response.token); 
       return response;
     } catch (error) {
       const message = extractErrorMessage(error, "Sign-in failed");
@@ -66,7 +60,6 @@ export const signIn = createAsyncThunk(
   }
 );
 
-// Verify user email
 export const verifyEmail = createAsyncThunk(
   "auth/verifyEmail",
   async (token, { rejectWithValue }) => {
@@ -80,7 +73,6 @@ export const verifyEmail = createAsyncThunk(
   }
 );
 
-// Resend verification email
 export const resendVerification = createAsyncThunk(
   "auth/resendVerification",
   async (email, { rejectWithValue }) => {
@@ -94,7 +86,6 @@ export const resendVerification = createAsyncThunk(
   }
 );
 
-// Forgot password request
 export const forgotPassword = createAsyncThunk(
   "auth/forgotPassword",
   async ({ email }, { rejectWithValue }) => {
@@ -108,7 +99,6 @@ export const forgotPassword = createAsyncThunk(
   }
 );
 
-// Reset user password
 export const resetPassword = createAsyncThunk(
   "auth/resetPassword",
   async ({ token, password, passwordConfirm }, { rejectWithValue }) => {

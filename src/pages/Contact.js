@@ -70,6 +70,7 @@ const Contact = () => {
     e.preventDefault();
 
     if (validateForm()) {
+      console.log("Submitting Data:", formData); // Debugging Log
       dispatch(sendContactMessage(formData));
     }
   };

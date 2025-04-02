@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { List, PlusCircle, FileText } from "lucide-react";
-import ProductList from "./products/ProductDeleteAlert";
 import AddProductForm from "./products/AddProductForm";
-
+import AllProducts from "./products/AllProducts";
 const Products = () => {
   const [activeTab, setActiveTab] = useState("list");
 
@@ -45,7 +44,7 @@ const Products = () => {
         </button>
       </div>
 
-      {activeTab === "list" && <ProductList />}
+      {activeTab === "list" && <AllProducts />}
       {activeTab === "add" && <AddProductForm />}
       {activeTab === "import" && (
         <div className="bg-white p-6 rounded-lg shadow-md">
