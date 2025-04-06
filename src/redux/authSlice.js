@@ -12,15 +12,15 @@ import Cookies from "universal-cookie";
 const cookies = new Cookies();
 
 const initialState = {
-  user: null, // Logged-in user data
-  token: cookies.get("token") || null, // JWT token from cookies
-  loading: false, // Loading state for async operations
-  error: null, // Error message for failed operations
-  emailVerified: false, // Whether the user's email is verified
-  resendSuccess: false, // Whether resend verification email was successful
-  resendError: null, // Error message for resend verification
-  forgotPasswordSuccess: false, // Whether forgot password request was successful
-  resetPasswordSuccess: false, // Whether password reset was successful
+  user: null, 
+  token: cookies.get("token") || null, 
+  loading: false,
+  error: null, 
+  emailVerified: false, 
+  resendSuccess: false, 
+  resendError: null, 
+  forgotPasswordSuccess: false, 
+  resetPasswordSuccess: false,
 };
 
 const authSlice = createSlice({

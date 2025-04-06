@@ -18,25 +18,16 @@ const AddProductForm = () => {
     images: [],
   });
 
-  const [imagePreview, setImagePreview] = useState(null);
-
+  // When file input changes, add the new images to the existing list.
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
 
-    if (type === "file" && files.length > 0) {
+    if (type === "file" && files && files.length > 0) {
+      const filesArray = Array.from(files);
       setFormData((prev) => ({
         ...prev,
-        images: [...files], // Store file objects for upload
+        images: [...prev.images, ...filesArray],
       }));
-
-      // Create image preview of the first file
-      if (files.length > 0) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setImagePreview(reader.result);
-        };
-        reader.readAsDataURL(files[0]);
-      }
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -45,24 +36,21 @@ const AddProductForm = () => {
     }
   };
 
-  const clearImagePreview = () => {
-    setImagePreview(null);
+  // Remove a specific image by its index.
+  const removeImage = (index) => {
     setFormData((prev) => ({
       ...prev,
-      images: [],
+      images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Create FormData object for multipart/form-data (for image upload)
+    // Create FormData object for supporting file upload.
     const productData = new FormData();
-
-    // Append all form fields to FormData
     Object.keys(formData).forEach((key) => {
-      if (key === "images" && formData[key].length) {
-        // Append each image file
+      if (key === "images" && formData[key].length > 0) {
         formData[key].forEach((image) => {
           productData.append("images", image);
         });
@@ -94,7 +82,6 @@ const AddProductForm = () => {
       description: "",
       images: [],
     });
-    setImagePreview(null);
   };
 
   return (
@@ -112,57 +99,49 @@ const AddProductForm = () => {
           <div className="text-sm font-medium text-gray-700 mb-2">
             Product Images
           </div>
-
-          {!imagePreview ? (
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md bg-white">
-              <div className="space-y-1 text-center">
-                <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                <div className="flex text-sm text-gray-600">
-                  <label
-                    htmlFor="image-upload"
-                    className="relative cursor-pointer bg-white rounded-md font-medium text-[#A0522D] hover:text-[#8B4513] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#A0522D]"
+          <div className="mt-1 flex flex-wrap gap-4">
+            {formData.images.map((image, index) => {
+              const url = URL.createObjectURL(image);
+              return (
+                <div key={index} className="relative h-32 w-32">
+                  <img
+                    src={url}
+                    alt={`Preview ${index}`}
+                    className="w-full h-full object-cover rounded-md"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100 transition-colors"
                   >
-                    <span>Upload images</span>
-                    <input
-                      id="image-upload"
-                      name="images"
-                      type="file"
-                      className="sr-only"
-                      onChange={handleChange}
-                      accept="image/*"
-                      multiple
-                    />
-                  </label>
-                  <p className="pl-1">or drag and drop</p>
+                    <X className="w-4 h-4 text-gray-700" />
+                  </button>
                 </div>
-                <p className="text-xs text-gray-500">
-                  PNG, JPG, GIF up to 10MB
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="relative mt-2">
-              <div className="relative h-48 overflow-hidden rounded-md">
-                <img
-                  src={imagePreview}
-                  alt="Product preview"
-                  className="w-full h-full object-cover"
-                />
-                {formData.images.length > 1 && (
-                  <div className="absolute bottom-2 right-2 bg-white px-2 py-1 rounded-full text-xs font-medium text-gray-700">
-                    +{formData.images.length - 1} more
-                  </div>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={clearImagePreview}
-                className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100 transition-colors"
+              );
+            })}
+            {/* Always show an "add image" tile */}
+            <div className="flex items-center justify-center h-32 w-32 border-2 border-dashed rounded-md bg-white">
+              <label
+                htmlFor="multi-image-upload"
+                className="cursor-pointer flex flex-col items-center"
               >
-                <X className="w-4 h-4 text-gray-700" />
-              </button>
+                <Upload className="h-8 w-8 text-gray-400 mb-1" />
+                <span className="text-xs text-gray-500">Add images</span>
+                <input
+                  id="multi-image-upload"
+                  name="images"
+                  type="file"
+                  className="hidden"
+                  onChange={handleChange}
+                  accept="image/*"
+                  multiple
+                />
+              </label>
             </div>
-          )}
+          </div>
+          <p className="mt-2 text-xs text-gray-500">
+            PNG, JPG, GIF up to 10MB each
+          </p>
         </div>
       </div>
 
@@ -176,7 +155,7 @@ const AddProductForm = () => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:border-[#A0522D] focus:ring focus:ring-[#A0522D]/20 transition-colors"
+            className="block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:border-[#A0522D]"
             placeholder="Enter product name"
             required
             maxLength={100}
@@ -192,7 +171,7 @@ const AddProductForm = () => {
             name="brand"
             value={formData.brand}
             onChange={handleChange}
-            className="block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:border-[#A0522D] focus:ring focus:ring-[#A0522D]/20 transition-colors"
+            className="block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:border-[#A0522D]"
             placeholder="Enter brand name"
             required
           />
@@ -202,22 +181,15 @@ const AddProductForm = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Price*
           </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-gray-500">$</span>
-            </div>
-            <input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              className="block w-full pl-7 px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:border-[#A0522D] focus:ring focus:ring-[#A0522D]/20 transition-colors"
-              placeholder="0.00"
-              min="0"
-              step="0.01"
-              required
-            />
-          </div>
+          <input
+            type="number"
+            name="price"
+            value={formData.price}
+            onChange={handleChange}
+            className="block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:border-[#A0522D]"
+            placeholder="Enter price"
+            required
+          />
         </div>
 
         <div>
@@ -228,15 +200,15 @@ const AddProductForm = () => {
             name="category"
             value={formData.category}
             onChange={handleChange}
-            className="block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:border-[#A0522D] focus:ring focus:ring-[#A0522D]/20 transition-colors"
+            className="block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:border-[#A0522D]"
             required
           >
-            <option value="">Select Category</option>
-            <option value="Wall Art">Wall Art</option>
-            <option value="Vases">Vases</option>
-            <option value="Living Room">Living Room</option>
-            <option value="Decor">Decor</option>
+            <option value="">Select category</option>
             <option value="Lighting">Lighting</option>
+            <option value="Decor">Decor</option>
+            <option value="Living Room">Living Room</option>
+            <option value="Vases">Vases</option>
+            <option value="Wall Art">Wall Art</option>
           </select>
         </div>
       </div>
@@ -250,7 +222,7 @@ const AddProductForm = () => {
           value={formData.description}
           onChange={handleChange}
           rows={4}
-          className="block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:border-[#A0522D] focus:ring focus:ring-[#A0522D]/20 transition-colors"
+          className="block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:border-[#A0522D]"
           placeholder="Enter product description"
           required
         ></textarea>
@@ -259,7 +231,7 @@ const AddProductForm = () => {
       <div className="mt-8 flex gap-4">
         <button
           type="button"
-          className="px-6 py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+          className="px-6 py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
           onClick={resetForm}
         >
           Reset
@@ -267,15 +239,9 @@ const AddProductForm = () => {
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-[#A0522D] text-white py-3 rounded-md hover:bg-[#8B4513] transition-colors flex items-center justify-center disabled:bg-opacity-70 disabled:cursor-not-allowed"
+          className="flex-1 bg-[#A0522D] text-white py-3 rounded-md hover:bg-[#8B4513] transition-colors"
         >
-          {loading ? (
-            <span>Adding...</span>
-          ) : (
-            <>
-              <Plus className="w-5 h-5 mr-2" /> Add Product
-            </>
-          )}
+          {loading ? "Adding..." : "Add Product"}
         </button>
       </div>
 

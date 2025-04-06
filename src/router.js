@@ -30,7 +30,7 @@ import Customers from "./components/adminPage/Customers";
 import Products from "./components/adminPage/Products";
 import EditUser from "./components/adminPage/customers/editUser";
 import ContactMessages from "./components/adminPage/ContactMessages";
-
+import ProductView from "./components/adminPage/products/ProductView";
 
 const router = createBrowserRouter([
   {
@@ -130,6 +130,10 @@ const router = createBrowserRouter([
       {
         path: "orders",
         element: <Orders />,
+      },
+      {
+        path: "product/:productId",
+        element: <ProductView />,
       },
     ],
   },

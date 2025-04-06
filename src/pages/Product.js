@@ -1,39 +1,55 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/cartSlice";
 import { toast } from "react-toastify";
 import Header from "../components/header/header";
 import Footer from "../components/footer/footer";
 import Explore from "../components/productPage/explore";
+import Reviews from "../components/productPage/Reviews";
 import ScrollToTop from "../components/scrollToTop";
-import { products } from "../data";
+import { useGetProductById } from "../api/products/productsApi"; // Updated hook
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Product = () => {
-  const [quantity, setQuantity] = useState(1);
   const { id } = useParams();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [product, setProduct] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [activeTab, setActiveTab] = useState("description");
 
-  useEffect(() => {
-    const productId = parseInt(id);
-    const foundProduct = products.find((p) => p.id === productId);
+  // Directly fetch the product by ID from the API.
+  const {
+    data: product,
+    isLoading: loadingProduct,
+    error: productError,
+  } = useGetProductById(id);
 
-    if (foundProduct) {
-      setProduct(foundProduct);
-    } else {
-      navigate("/shop");
-    }
-  }, [id, navigate]);
+  if (loadingProduct) {
+    return (
+      <div className="flex flex-col justify-center items-center">
+        <Header />
+        <div className="container mx-auto px-6 py-4">Loading product...</div>
+      </div>
+    );
+  }
+
+  if (productError) {
+    return (
+      <div className="flex flex-col justify-center items-center">
+        <Header />
+        <div className="container mx-auto px-6 py-4">
+          Error loading product: {productError.message}
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
       <div className="flex flex-col justify-center items-center">
         <Header />
-        <div className="container mx-auto px-6 py-4">Loading...</div>
+        <div className="container mx-auto px-6 py-4">Product not found.</div>
       </div>
     );
   }
@@ -48,7 +64,6 @@ const Product = () => {
     };
     dispatch(addToCart(productToAdd));
 
-    // Show toast notification
     toast.success(`${product.name} added to cart successfully!`, {
       position: "top-right",
       autoClose: 3000,
@@ -79,7 +94,7 @@ const Product = () => {
         <div className="grid grid-cols-1 md:grid-cols-10 gap-16">
           <div className="md:col-span-5">
             <img
-              src={product.image}
+              src={product.images[0]}
               alt={product.name}
               className="w-full h-auto object-contain"
             />
@@ -109,7 +124,9 @@ const Product = () => {
                     type="number"
                     min="1"
                     value={quantity}
-                    onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                    onChange={(e) =>
+                      setQuantity(parseInt(e.target.value, 10) || 1)
+                    }
                     className="border px-2 py-2 w-16"
                   />
                 </div>
@@ -122,6 +139,64 @@ const Product = () => {
               </div>
             </div>
             <hr />
+          </div>
+        </div>
+
+        {/* Product Tabs Navigation */}
+        <div className="mt-12">
+          <div className="border-b border-gray-200">
+            <nav className="flex space-x-8">
+              <button
+                onClick={() => setActiveTab("description")}
+                className={`py-4 px-1 ${
+                  activeTab === "description"
+                    ? "border-b-2 border-black font-medium"
+                    : "text-gray-500 hover:text-black"
+                }`}
+              >
+                Product Details
+              </button>
+              <button
+                onClick={() => setActiveTab("reviews")}
+                className={`py-4 px-1 ${
+                  activeTab === "reviews"
+                    ? "border-b-2 border-black font-medium"
+                    : "text-gray-500 hover:text-black"
+                }`}
+              >
+                Reviews
+              </button>
+            </nav>
+          </div>
+
+          {/* Tab Content */}
+          <div className="py-6">
+            {activeTab === "description" && (
+              <div>
+                <h2 className="text-xl font-medium mb-4">
+                  Product Description
+                </h2>
+                <p className="text-gray-700">
+                  {product.description ||
+                    "No description available for this product."}
+                </p>
+
+                {product.details && (
+                  <div className="mt-6">
+                    <h3 className="text-lg font-medium mb-2">Specifications</h3>
+                    <ul className="list-disc pl-5">
+                      {Object.entries(product.details).map(([key, value]) => (
+                        <li key={key} className="mb-1">
+                          <span className="font-medium">{key}:</span> {value}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "reviews" && <Reviews productId={product.id} />}
           </div>
         </div>
         <Explore category={product.category} />
