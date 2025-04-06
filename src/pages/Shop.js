@@ -4,7 +4,6 @@ import Header from "../components/header/header";
 import Footer from "../components/footer/footer";
 import { useGetAllProducts } from "../api/products/productsApi";
 import Product from "../components/product/product";
-import ScrollToTop from "../components/scrollToTop";
 
 const Shop = () => {
   const { category } = useParams();
@@ -42,7 +41,6 @@ const Shop = () => {
 
   return (
     <div className="flex flex-col justify-center items-center">
-      <ScrollToTop />
       <Header />
       <div className="container mx-auto px-4 my-10">
         <div className="flex flex-col md:flex-row gap-6">

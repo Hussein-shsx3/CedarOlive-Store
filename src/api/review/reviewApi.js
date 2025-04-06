@@ -6,17 +6,24 @@ import { useQuery } from "@tanstack/react-query";
 const cookies = new Cookies();
 
 const api = axios.create({
-  baseURL: `${process.env.REACT_APP_API_URL}/api/v1`,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: `${process.env.REACT_APP_API_URL}/api/v1/reviews`,
+  headers: { "Content-Type": "application/json" },
 });
 
 api.interceptors.request.use((config) => {
   const token = cookies.get("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+const productApi = axios.create({
+  baseURL: `${process.env.REACT_APP_API_URL}/api/v1/products`,
+  headers: { "Content-Type": "application/json" },
+});
+
+productApi.interceptors.request.use((config) => {
+  const token = cookies.get("token");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
@@ -25,10 +32,10 @@ export const useGetAllReviews = (productId) =>
     queryKey: ["reviews", productId],
     queryFn: async () => {
       if (!productId) throw new Error("Product ID is required.");
-      const { data } = await api.get(`/products/${productId}/reviews`);
+      const { data } = await productApi.get(`/${productId}/reviews`);
       return data.data;
     },
-    enabled: !!productId && !!cookies.get("token"),
+    enabled: !!productId,
   });
 
 export const useGetReviewById = (reviewId) =>
@@ -36,7 +43,7 @@ export const useGetReviewById = (reviewId) =>
     queryKey: ["review", reviewId],
     queryFn: async () => {
       if (!reviewId) throw new Error("Review ID is required.");
-      const { data } = await api.get(`/reviews/${reviewId}`);
+      const { data } = await api.get(`/${reviewId}`);
       return data.data;
     },
     enabled: !!reviewId && !!cookies.get("token"),
@@ -46,8 +53,8 @@ export const createReview = createAsyncThunk(
   "review/createReview",
   async ({ productId, ...reviewData }, thunkAPI) => {
     try {
-      const response = await api.post(
-        `/products/${productId}/reviews`,
+      const response = await productApi.post(
+        `/${productId}/reviews`,
         reviewData
       );
       return response.data.data;
@@ -63,7 +70,7 @@ export const updateReview = createAsyncThunk(
   "review/updateReview",
   async ({ reviewId, ...updatedData }, thunkAPI) => {
     try {
-      const response = await api.patch(`/reviews/${reviewId}`, updatedData);
+      const response = await api.patch(`/${reviewId}`, updatedData);
       return response.data.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -73,18 +80,11 @@ export const updateReview = createAsyncThunk(
   }
 );
 
-//
-// ---------- DELETE (Redux Toolkit)
-//
-
-/**
- * Delete a review by ID
- */
 export const deleteReview = createAsyncThunk(
   "review/deleteReview",
   async (reviewId, thunkAPI) => {
     try {
-      const response = await api.delete(`/reviews/${reviewId}`);
+      const response = await api.delete(`/${reviewId}`);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(

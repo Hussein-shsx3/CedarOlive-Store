@@ -27,7 +27,6 @@ export const useGetAllProducts = () =>
       const { data } = await api.get("");
       return data.data;
     },
-    enabled: !!cookies.get("token"),
   });
 
 export const useGetProductById = (productId) =>
@@ -38,7 +37,7 @@ export const useGetProductById = (productId) =>
       const response = await api.get(`/${productId}`);
       return response.data.data;
     },
-    enabled: !!productId && !!cookies.get("token"),
+    enabled: !!productId,
   });
 
 export const createProduct = createAsyncThunk(

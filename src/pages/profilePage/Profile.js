@@ -14,7 +14,6 @@ import {
   Settings,
 } from "lucide-react";
 import Header from "../../components/header/header";
-import ScrollToTop from "../../components/scrollToTop";
 
 const cookies = new Cookies();
 
@@ -79,7 +78,6 @@ const Profile = () => {
 
   return (
     <div className="flex flex-col justify-center">
-      <ScrollToTop />
       <Header />
       <div
         className="min-h-screen py-8 px-4 md:px-8"

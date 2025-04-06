@@ -4,7 +4,6 @@ import { resetContactForm } from "../redux/contactSlice";
 import { sendContactMessage } from "../api/contact/contactApi";
 import Header from "../components/header/header";
 import Footer from "../components/footer/footer";
-import ScrollToTop from "../components/scrollToTop";
 import {
   Mail,
   Phone,
@@ -94,7 +93,6 @@ const Contact = () => {
 
   return (
     <div className="flex flex-col justify-center items-center">
-      <ScrollToTop />
       <Header />
 
       <main className="flex-grow container mx-auto px-4 py-16">

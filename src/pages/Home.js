@@ -8,7 +8,6 @@ import Section5 from "../components/homePage/section5";
 import Section6 from "../components/homePage/section6";
 import Section7 from "../components/homePage/section7";
 import Footer from "../components/footer/footer";
-import ScrollToTop from "../components/scrollToTop";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -26,7 +25,6 @@ function Home() {
         draggable
         pauseOnHover
       />
-      <ScrollToTop />
       <Header />
       <Section1 />
       <Section2 />
