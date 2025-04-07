@@ -166,10 +166,7 @@ const ContactMessages = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-full">
-        <div className="flex flex-col items-center">
-          <RefreshCw className="w-10 h-10 text-[#A0522D] animate-spin" />
-          <p className="mt-4 text-[#8a8888]">Loading messages...</p>
-        </div>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-[#A0522D]"></div>
       </div>
     );
   }
