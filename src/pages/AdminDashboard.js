@@ -15,9 +15,8 @@ import {
 } from "lucide-react";
 import { Link, Outlet, NavLink, useNavigate, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useGetCurrentUser } from "../api/users/userApi";
 import { logout } from "../redux/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const AdminDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -26,7 +25,9 @@ const AdminDashboard = () => {
   const profileDropdownRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { data: user } = useGetCurrentUser();
+
+  // Replace useGetCurrentUser with useSelector to get user from Redux store
+  const user = useSelector((state) => state.user.currentUser);
 
   useEffect(() => {
     const handleClickOutside = (event) => {

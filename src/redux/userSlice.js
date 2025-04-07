@@ -1,4 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
+import storage from "redux-persist/lib/storage"; // Uses localStorage by default
+import { persistReducer } from "redux-persist";
 import {
   updateMe,
   updatePassword,
@@ -8,6 +10,14 @@ import {
   deleteUserById,
 } from "../api/users/userApi";
 
+// 1️⃣ Persist config
+const persistConfig = {
+  key: "user",
+  storage,
+  whitelist: ["currentUser"], // only persist currentUser (adjust as needed)
+};
+
+// 2️⃣ Initial state
 const initialState = {
   currentUser: null,
   allUsers: [],
@@ -16,6 +26,7 @@ const initialState = {
   error: null,
 };
 
+// 3️⃣ Slice
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -42,14 +53,12 @@ const userSlice = createSlice({
       })
       .addCase(updateUserById.fulfilled, (state, action) => {
         state.status = "succeeded";
-
         const index = state.allUsers.findIndex(
           (user) => user.id === action.payload.id
         );
         if (index !== -1) {
           state.allUsers[index] = action.payload;
         }
-
         if (state.userById && state.userById.id === action.payload.id) {
           state.userById = action.payload;
         }
@@ -114,7 +123,6 @@ const userSlice = createSlice({
         state.allUsers = state.allUsers.filter(
           (user) => user.id !== action.payload.id
         );
-
         if (state.userById && state.userById.id === action.payload.id) {
           state.userById = null;
         }
@@ -126,7 +134,9 @@ const userSlice = createSlice({
   },
 });
 
+// 4️⃣ Export actions
 export const { setCurrentUser, setAllUsers, setUserById, resetUserStatus } =
   userSlice.actions;
 
-export default userSlice.reducer;
+// 5️⃣ Export persisted reducer
+export default persistReducer(persistConfig, userSlice.reducer);

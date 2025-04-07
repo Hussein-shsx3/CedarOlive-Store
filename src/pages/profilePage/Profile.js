@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
-import { useGetCurrentUser } from "../../api/users/userApi";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/authSlice";
-import { useNavigate, Outlet, Link, useLocation } from "react-router-dom"; // Import useLocation
+import { useNavigate, Outlet, Link, useLocation } from "react-router-dom";
 import Cookies from "universal-cookie";
 import {
   Camera,
@@ -18,7 +17,8 @@ import Header from "../../components/header/header";
 const cookies = new Cookies();
 
 const Profile = () => {
-  const { data: user, isLoading, isError } = useGetCurrentUser();
+  // Replace useGetCurrentUser with useSelector to get user from Redux store
+  const user = useSelector((state) => state.user.currentUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,10 +32,10 @@ const Profile = () => {
 
   // Redirect if user data is not found
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (!user) {
       navigate("/signin");
     }
-  }, [user, isLoading, navigate]);
+  }, [user, navigate]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -43,7 +43,8 @@ const Profile = () => {
     navigate("/signin");
   };
 
-  if (isLoading) {
+  // Show loading state if user data is not yet available
+  if (!user) {
     return (
       <div
         className="flex h-screen items-center justify-center"
@@ -53,25 +54,6 @@ const Profile = () => {
           className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent"
           style={{ color: "var(--color-secondary)" }}
         ></div>
-      </div>
-    );
-  }
-
-  if (isError || !user) {
-    return (
-      <div
-        className="flex h-screen items-center justify-center"
-        style={{ backgroundColor: "var(--color-background)" }}
-      >
-        <div className="text-center" style={{ color: "var(--color-text)" }}>
-          <h2
-            className="text-xl font-semibold mb-2"
-            style={{ color: "var(--color-title)" }}
-          >
-            Failed to load profile
-          </h2>
-          <p>Please try again later or contact support.</p>
-        </div>
       </div>
     );
   }

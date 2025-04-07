@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGetCurrentUser } from "../../api/users/userApi";
 import { logout } from "../../redux/authSlice";
 import { removeFromCart, clearCart } from "../../redux/cartSlice";
 import { User } from "lucide-react";
 import { toast } from "react-toastify";
 import { products } from "../../data";
-import SearchOverlay from "./SearchOverlay"; // Import the SearchOverlay component
+import SearchOverlay from "./SearchOverlay";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,10 +18,10 @@ const Header = () => {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
 
-  // Get current user using React Query
-  const { data: user } = useGetCurrentUser();
+  // Get current user from Redux store instead of React Query
+  const user = useSelector((state) => state.user.currentUser);
 
-  // Redux store data
+  // Redux store data for cart
   const { cartItems, totalAmount } = useSelector((state) => state.cart);
 
   const navLinks = [
