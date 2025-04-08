@@ -5,7 +5,12 @@ import ProductSkeleton from "../loading/ProductSkeleton";
 import { useGetAllProducts } from "../../api/products/productsApi";
 
 const Section5 = () => {
-  const { data: products, isLoading, error } = useGetAllProducts();
+  const { data, isLoading, error } = useGetAllProducts({
+    brand: "PALESTINIAN",
+    limit: 4,
+  });
+
+  const products = data?.products || [];
 
   return (
     <section className="container w-full my-16 px-5 md:px-0">

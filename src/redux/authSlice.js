@@ -12,14 +12,14 @@ import Cookies from "universal-cookie";
 const cookies = new Cookies();
 
 const initialState = {
-  user: null, 
-  token: cookies.get("token") || null, 
+  user: null,
+  token: cookies.get("token") || null,
   loading: false,
-  error: null, 
-  emailVerified: false, 
-  resendSuccess: false, 
-  resendError: null, 
-  forgotPasswordSuccess: false, 
+  error: null,
+  emailVerified: false,
+  resendSuccess: false,
+  resendError: null,
+  forgotPasswordSuccess: false,
   resetPasswordSuccess: false,
 };
 
@@ -64,7 +64,7 @@ const authSlice = createSlice({
         state.token = token;
         cookies.set("token", token, {
           path: "/",
-          expires: new Date(Date.now() + 3600 * 1000), // 1 hour
+          expires: new Date(Date.now() + 24 * 3600 * 1000), // 1 day
         });
       })
       .addCase(signIn.rejected, (state, action) => {

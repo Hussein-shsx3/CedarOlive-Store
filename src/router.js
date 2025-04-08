@@ -47,8 +47,6 @@ const router = createBrowserRouter([
     element: <Root />, // 👈 Layout with ScrollToTop
     children: [
       { index: true, element: <Home /> },
-      { path: "signIn", element: <SignIn /> },
-      { path: "signUp", element: <SignUp /> },
       {
         path: "profile",
         element: <Profile />,
@@ -90,6 +88,8 @@ const router = createBrowserRouter([
       { path: "*", element: <NotFound /> },
     ],
   },
+  { path: "signIn", element: <SignIn /> },
+  { path: "signUp", element: <SignUp /> },
 ]);
 
 export default router;

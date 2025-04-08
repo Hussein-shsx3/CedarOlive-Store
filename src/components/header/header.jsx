@@ -6,17 +6,41 @@ import { logout } from "../../redux/authSlice";
 import { removeFromCart, clearCart } from "../../redux/cartSlice";
 import { User } from "lucide-react";
 import { toast } from "react-toastify";
-import { products } from "../../data";
 import SearchOverlay from "./SearchOverlay";
+import { resetUserState } from "../../redux/userSlice";
+import { useGetAllProducts } from "../../api/products/productsApi";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
+
+  // Define queryParams for the products API call with search functionality
+  const queryParams = {
+    limit: 100,
+    page: 1,
+    sort: "createdAt",
+    order: "desc",
+    // Add search parameters when searchTerm is present
+    ...(searchTerm && {
+      $or: [
+        { name: { $regex: searchTerm, $options: "i" } },
+        { description: { $regex: searchTerm, $options: "i" } },
+        { category: { $regex: searchTerm, $options: "i" } },
+      ],
+    }),
+  };
+
+  // Get all products using the API hook
+  const { data, isLoading } = useGetAllProducts(queryParams);
+
+  // Use API data if available, or fallback to empty array if data is loading
+  const allProducts = data?.products || [];
 
   // Get current user from Redux store instead of React Query
   const user = useSelector((state) => state.user.currentUser);
@@ -84,6 +108,7 @@ const Header = () => {
   const handleLogout = () => {
     dispatch(logout());
     dispatch(clearCart());
+    dispatch(resetUserState());
     queryClient.removeQueries(["currentUser"]);
     setIsProfileOpen(false);
     navigate("/signIn");
@@ -128,6 +153,11 @@ const Header = () => {
     }
   };
 
+  // Handle search input change
+  const handleSearchChange = (term) => {
+    setSearchTerm(term);
+  };
+
   // Direct navigation to admin dashboard
   const goToAdminDashboard = () => {
     navigate("/admin");
@@ -141,7 +171,10 @@ const Header = () => {
       <SearchOverlay
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
-        products={products}
+        products={allProducts}
+        isLoading={isLoading}
+        onSearchChange={handleSearchChange}
+        searchTerm={searchTerm}
       />
 
       <header className="w-full bg-background shadow-sm py-4">

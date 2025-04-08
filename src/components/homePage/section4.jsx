@@ -4,7 +4,15 @@ import ProductSkeleton from "../loading/ProductSkeleton";
 import { useGetAllProducts } from "../../api/products/productsApi";
 
 const Section4 = () => {
-  const { data: products, isLoading, error } = useGetAllProducts();
+  // Adding query parameters to limit to only 4 products
+  const queryParams = {
+    limit: 4,
+  };
+
+  const { data, isLoading, error } = useGetAllProducts(queryParams);
+
+  // Extract just the products array from the data
+  const products = data?.products || [];
 
   return (
     <section className="container px-5 md:px-0 py-12">
@@ -23,11 +31,11 @@ const Section4 = () => {
           Array(4)
             .fill(0)
             .map((_, index) => <ProductSkeleton key={`skeleton-${index}`} />)
-        ) : products?.length > 0 ? (
-          // Display only the first 4 products
-          products
-            .slice(0, 4)
-            .map((product) => <Product key={product.id} product={product} />)
+        ) : products.length > 0 ? (
+          // Display the products - no need to slice since we're already limiting to 4
+          products.map((product) => (
+            <Product key={product._id} product={product} />
+          ))
         ) : (
           // Handle empty state
           <div className="col-span-full text-center py-10 text-gray-500">

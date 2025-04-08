@@ -8,20 +8,61 @@ import { useDispatch } from "react-redux";
 import { Trash2, Eye, Star } from "lucide-react";
 
 const AllProducts = () => {
-  const { data: products, isLoading, error, refetch } = useGetAllProducts();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const productsPerPage = 10;
+  const productsPerPage = 12;
 
-  // Reset to first page when search term changes
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // Debounce search term to reduce rendering
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const queryParams = {
+    limit: 100, 
+  };
+
+  const { data, isLoading, error, refetch } = useGetAllProducts(queryParams);
+
+  const allProducts = data?.products || [];
+
+  const filteredProducts = debouncedSearchTerm
+    ? allProducts.filter((product) => {
+        const searchLower = debouncedSearchTerm.toLowerCase();
+        return (
+          product.name.toLowerCase().includes(searchLower) ||
+          product.brand.toLowerCase().includes(searchLower) ||
+          product.category.toLowerCase().includes(searchLower)
+        );
+      })
+    : allProducts;
+
+  // Calculate pagination
+  const totalProducts = filteredProducts.length;
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+
+  // Get current page of products
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  // Reset to first page when search changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [debouncedSearchTerm]);
 
   // Prepare for delete
   const prepareDelete = (product, e) => {
@@ -40,9 +81,7 @@ const AllProducts = () => {
         await refetch();
 
         // If we're on a page that would now be empty, go back one page
-        const remainingItemsOnCurrentPage =
-          filteredProducts.length - indexOfFirstProduct;
-        if (remainingItemsOnCurrentPage === 1 && currentPage > 1) {
+        if (currentProducts.length === 1 && currentPage > 1) {
           setCurrentPage(currentPage - 1);
         }
       } catch (error) {
@@ -65,25 +104,6 @@ const AllProducts = () => {
     setShowConfirmation(false);
     setSelectedProduct(null);
   };
-
-  // Filter products based on search term
-  const filteredProducts = products
-    ? products.filter(
-        (product) =>
-          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.category.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : [];
-
-  // Pagination logic
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  );
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   // Render star ratings
   const renderStars = (rating) => {
@@ -227,9 +247,9 @@ const AllProducts = () => {
       {totalPages > 1 && (
         <div className="flex justify-between items-center mt-4">
           <div className="text-sm text-gray-600">
-            Showing {indexOfFirstProduct + 1} to{" "}
-            {Math.min(indexOfLastProduct, filteredProducts.length)} of{" "}
-            {filteredProducts.length} products
+            Showing {Math.min(totalProducts, 1) + indexOfFirstProduct} to{" "}
+            {Math.min(indexOfLastProduct, totalProducts)} of {totalProducts}{" "}
+            products
           </div>
           <div className="flex gap-1">
             <button
@@ -243,19 +263,41 @@ const AllProducts = () => {
             >
               Previous
             </button>
-            {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentPage(index + 1)}
-                className={`px-3 py-1 rounded ${
-                  currentPage === index + 1
-                    ? "bg-[#A0522D] text-white"
-                    : "bg-gray-200 hover:bg-gray-300"
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
+
+            {/* Show limited page numbers for better UX when many pages */}
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              // Calculate which page numbers to show
+              let startPage;
+              if (currentPage <= 3) {
+                startPage = 1;
+              } else if (currentPage >= totalPages - 2) {
+                startPage = Math.max(1, totalPages - 4);
+              } else {
+                startPage = currentPage - 2;
+              }
+
+              const pageNumber = startPage + i;
+
+              // Only show if page number is valid
+              if (pageNumber <= 0 || pageNumber > totalPages) {
+                return null;
+              }
+
+              return (
+                <button
+                  key={pageNumber}
+                  onClick={() => setCurrentPage(pageNumber)}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === pageNumber
+                      ? "bg-[#A0522D] text-white"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  }`}
+                >
+                  {pageNumber}
+                </button>
+              );
+            })}
+
             <button
               onClick={() =>
                 setCurrentPage(Math.min(totalPages, currentPage + 1))

@@ -1,6 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import storage from "redux-persist/lib/storage"; // Uses localStorage by default
-import { persistReducer } from "redux-persist";
 import {
   updateMe,
   updatePassword,
@@ -10,39 +8,43 @@ import {
   deleteUserById,
 } from "../api/users/userApi";
 
-// 1️⃣ Persist config
-const persistConfig = {
-  key: "user",
-  storage,
-  whitelist: ["currentUser"], // only persist currentUser (adjust as needed)
-};
-
-// 2️⃣ Initial state
 const initialState = {
   currentUser: null,
   allUsers: [],
   userById: null,
   status: "idle",
   error: null,
+  lastUpdated: null,
 };
 
-// 3️⃣ Slice
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
     setCurrentUser(state, action) {
       state.currentUser = action.payload;
+      state.lastUpdated = Date.now();
     },
     setAllUsers(state, action) {
       state.allUsers = action.payload;
+      state.lastUpdated = Date.now();
     },
     setUserById(state, action) {
       state.userById = action.payload;
+      state.lastUpdated = Date.now();
+    },
+    resetUserState() {
+      return { ...initialState, lastUpdated: null };
     },
     resetUserStatus(state) {
       state.status = "idle";
       state.error = null;
+    },
+    checkExpiration(state) {
+      const oneDayInMillis = 24 * 60 * 60 * 1000;
+      if (Date.now() - state.lastUpdated > oneDayInMillis) {
+        return { ...initialState, lastUpdated: null };
+      }
     },
   },
   extraReducers: (builder) => {
@@ -134,9 +136,13 @@ const userSlice = createSlice({
   },
 });
 
-// 4️⃣ Export actions
-export const { setCurrentUser, setAllUsers, setUserById, resetUserStatus } =
-  userSlice.actions;
+export const {
+  setCurrentUser,
+  setAllUsers,
+  setUserById,
+  resetUserStatus,
+  resetUserState,
+  checkExpiration,
+} = userSlice.actions;
 
-// 5️⃣ Export persisted reducer
-export default persistReducer(persistConfig, userSlice.reducer);
+export default userSlice.reducer;
