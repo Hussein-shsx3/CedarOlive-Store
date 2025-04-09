@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   useGetAllProducts,
@@ -29,34 +29,43 @@ const AllProducts = () => {
   }, [searchTerm]);
 
   const queryParams = {
-    limit: 100, 
+    limit: 100,
   };
 
   const { data, isLoading, error, refetch } = useGetAllProducts(queryParams);
 
-  const allProducts = data?.products || [];
+  // Use useMemo to memoize the allProducts array
+  const allProducts = useMemo(() => data?.products || [], [data?.products]);
 
-  const filteredProducts = debouncedSearchTerm
-    ? allProducts.filter((product) => {
-        const searchLower = debouncedSearchTerm.toLowerCase();
-        return (
-          product.name.toLowerCase().includes(searchLower) ||
-          product.brand.toLowerCase().includes(searchLower) ||
-          product.category.toLowerCase().includes(searchLower)
-        );
-      })
-    : allProducts;
+  const filteredProducts = useMemo(() => {
+    if (!debouncedSearchTerm) return allProducts;
+
+    const searchLower = debouncedSearchTerm.toLowerCase();
+    return allProducts.filter((product) => {
+      return (
+        product.name.toLowerCase().includes(searchLower) ||
+        product.brand.toLowerCase().includes(searchLower) ||
+        product.category.toLowerCase().includes(searchLower)
+      );
+    });
+  }, [debouncedSearchTerm, allProducts]);
 
   // Calculate pagination
   const totalProducts = filteredProducts.length;
   const totalPages = Math.ceil(totalProducts / productsPerPage);
 
   // Get current page of products
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
+  const currentProducts = useMemo(() => {
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    return filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  }, [filteredProducts, currentPage, productsPerPage]);
+
+  // Index calculations for display
+  const indexOfFirstProduct = (currentPage - 1) * productsPerPage;
+  const indexOfLastProduct = Math.min(
+    indexOfFirstProduct + productsPerPage,
+    totalProducts
   );
 
   // Reset to first page when search changes
@@ -247,9 +256,8 @@ const AllProducts = () => {
       {totalPages > 1 && (
         <div className="flex justify-between items-center mt-4">
           <div className="text-sm text-gray-600">
-            Showing {Math.min(totalProducts, 1) + indexOfFirstProduct} to{" "}
-            {Math.min(indexOfLastProduct, totalProducts)} of {totalProducts}{" "}
-            products
+            Showing {indexOfFirstProduct + 1} to {indexOfLastProduct} of{" "}
+            {totalProducts} products
           </div>
           <div className="flex gap-1">
             <button

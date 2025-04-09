@@ -363,7 +363,7 @@ const Header = () => {
                 ) : (
                   <Link
                     to="/signIn"
-                    className="group relative inline-block px-4 py-2 text-white bg-secondary overflow-hidden"
+                    className="group relative inline-block w-full sm:w-auto px-4 py-2 text-sm md:text-base text-white bg-secondary overflow-hidden"
                   >
                     <span className="absolute inset-0 bg-[#9a4a25] transition-transform duration-300 ease transform scale-x-0 origin-left group-hover:scale-x-100"></span>
                     <span className="relative">Sign In</span>

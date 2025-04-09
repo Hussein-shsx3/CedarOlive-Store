@@ -1,7 +1,8 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signIn } from "../../api/auth/authApi";
+import Cookies from "universal-cookie";
 
 // Create a memoized selector for better Redux performance
 const selectAuthError = (state) => state.auth.error;
@@ -19,6 +20,15 @@ const SignIn = () => {
 
   // Use memoized selector to prevent unnecessary re-renders
   const error = useSelector(selectAuthError);
+
+  useEffect(() => {
+    const cookies = new Cookies();
+    const token = cookies.get("token");
+
+    if (token) {
+      navigate("/");
+    }
+  }, [navigate]);
 
   // Memoize the validation function to prevent recreation on each render
   const validate = useCallback(() => {

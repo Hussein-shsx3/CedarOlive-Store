@@ -66,6 +66,22 @@ const SearchOverlay = ({
     }
   };
 
+  // Helper function to get the appropriate image URL
+  const getProductImageUrl = (product) => {
+    // Check if product has images array and it's not empty
+    if (product.images && product.images.length > 0) {
+      return product.images[0]; // Use the first image
+    }
+    // Fallback to direct image property if it exists
+    else if (product.image) {
+      return product.image;
+    }
+    // Return a placeholder if no images are available
+    else {
+      return "https://placehold.co/300x300?text=No+Image";
+    }
+  };
+
   return (
     <>
       {/* Dark overlay background */}
@@ -82,9 +98,9 @@ const SearchOverlay = ({
           isOpen ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-medium">Search Products</h2>
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xl font-medium">Search Products</h2>
             <button
               className="text-gray-500 hover:text-black transition duration-200"
               onClick={onClose}
@@ -92,7 +108,7 @@ const SearchOverlay = ({
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
+                className="h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -107,7 +123,7 @@ const SearchOverlay = ({
             </button>
           </div>
 
-          <div className="relative mb-6">
+          <div className="relative mb-4">
             <input
               ref={searchInputRef}
               type="text"
@@ -115,11 +131,11 @@ const SearchOverlay = ({
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               placeholder="Search for products..."
-              className="w-full py-3 px-4 border border-gray-300 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition duration-200 rounded-md"
+              className="w-full py-2 px-3 border border-gray-300 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition duration-200 rounded-md"
             />
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+              className="h-4 w-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -133,22 +149,24 @@ const SearchOverlay = ({
             </svg>
           </div>
 
-          <div className="search-results max-h-80 overflow-y-auto">
+          <div className="search-results max-h-72 overflow-y-auto">
             {isLoading ? (
-              <div className="py-8 text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary mx-auto"></div>
-                <p className="mt-2 text-gray-600">Loading products...</p>
+              <div className="py-4 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary mx-auto"></div>
+                <p className="mt-1 text-sm text-gray-600">
+                  Loading products...
+                </p>
               </div>
             ) : localSearchTerm.trim() === "" ? (
-              <div className="py-8 text-center text-gray-500">
+              <div className="py-4 text-center text-sm text-gray-500">
                 Enter a search term to find products
               </div>
             ) : filteredProducts.length === 0 ? (
-              <div className="py-8 text-center text-gray-500">
+              <div className="py-4 text-center text-sm text-gray-500">
                 No products found matching "{localSearchTerm}"
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 {filteredProducts.map((product) => (
                   <Link
                     key={product._id || product.id}
@@ -156,31 +174,31 @@ const SearchOverlay = ({
                     className="group"
                     onClick={onClose}
                   >
-                    <div className="bg-gray-100 aspect-square overflow-hidden relative">
+                    <div className="bg-gray-100 aspect-square overflow-hidden relative rounded">
                       <img
-                        src={product.image}
+                        src={getProductImageUrl(product)}
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       {product.discount > 0 && (
-                        <span className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                          {product.discount}% OFF
+                        <span className="absolute top-1 right-1 bg-red-500 text-white text-xs px-1 py-0.5 rounded text-xs">
+                          -{product.discount}%
                         </span>
                       )}
                     </div>
-                    <div className="mt-2">
-                      <h3 className="font-medium text-title group-hover:text-secondary transition-colors duration-200">
+                    <div className="mt-1 text-sm">
+                      <h3 className="font-medium text-title truncate group-hover:text-secondary transition-colors duration-200">
                         {product.name}
                       </h3>
-                      <p className="text-gray-600">
+                      <p className="text-xs text-gray-500 truncate">
                         {product.category || "Uncategorized"}
                       </p>
-                      <div className="flex items-center mt-1">
-                        <span className="font-medium">
+                      <div className="flex items-center mt-0.5">
+                        <span className="font-medium text-sm">
                           ${parseFloat(product.price).toFixed(2)}
                         </span>
                         {product.oldPrice && (
-                          <span className="ml-2 text-gray-500 line-through text-sm">
+                          <span className="ml-1 text-gray-500 line-through text-xs">
                             ${parseFloat(product.oldPrice).toFixed(2)}
                           </span>
                         )}
@@ -193,10 +211,10 @@ const SearchOverlay = ({
           </div>
 
           {filteredProducts.length > 0 && (
-            <div className="mt-6 text-center">
+            <div className="mt-3 text-center">
               <Link
                 to={`/shop/All?search=${encodeURIComponent(localSearchTerm)}`}
-                className="inline-block px-6 py-2 bg-secondary text-white rounded hover:bg-[#9a4a25] transition-colors duration-300"
+                className="inline-block px-4 py-1.5 text-sm bg-secondary text-white rounded hover:bg-[#9a4a25] transition-colors duration-300"
                 onClick={onClose}
               >
                 View All Results

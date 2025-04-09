@@ -196,20 +196,15 @@ const AddProductForm = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Category*
           </label>
-          <select
+          <input
+            type="text"
             name="category"
             value={formData.category}
             onChange={handleChange}
             className="block w-full px-3 py-2 rounded-md border border-gray-300 shadow-sm focus:border-[#A0522D]"
+            placeholder="Enter product category"
             required
-          >
-            <option value="">Select category</option>
-            <option value="Lighting">Lighting</option>
-            <option value="Decor">Decor</option>
-            <option value="Living Room">Living Room</option>
-            <option value="Vases">Vases</option>
-            <option value="Wall Art">Wall Art</option>
-          </select>
+          />
         </div>
       </div>
 

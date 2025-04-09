@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useSearchParams } from "react-router-dom";
 import Header from "../components/header/header";
 import Footer from "../components/footer/footer";
@@ -45,7 +45,11 @@ const Shop = () => {
 
   // Fetch all categories and brands only once when component mounts
   const { data: allProductsData } = useGetAllProducts({ limit: 1000 });
-  const allProducts = allProductsData?.products || [];
+
+  // Use useMemo to prevent allProducts from being recreated on every render
+  const allProducts = useMemo(() => {
+    return allProductsData?.products || [];
+  }, [allProductsData]);
 
   // Extract categories and brands from all products
   useEffect(() => {

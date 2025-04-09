@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { signUp } from "../../api/auth/authApi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Cookies from "universal-cookie";
 
 const SignUp = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
 
@@ -20,6 +22,15 @@ const SignUp = () => {
 
   // For error handling/validation messages
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    const cookies = new Cookies();
+    const token = cookies.get("token");
+
+    if (token) {
+      navigate("/");
+    }
+  }, [navigate]);
 
   // Calculate password strength when password changes
   useEffect(() => {
@@ -377,24 +388,46 @@ const SignUp = () => {
           </div>
 
           <div className="mb-4">
-            <label
-              htmlFor="phone"
-              className="block mb-2 text-sm font-medium"
-              style={{ color: "var(--color-title, #131313)" }}
-            >
-              Phone Number
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label
+                htmlFor="phone"
+                className="text-sm font-medium"
+                style={{ color: "var(--color-title, #131313)" }}
+              >
+                Phone Number
+              </label>
+              <span
+                className="text-xs italic"
+                style={{ color: "var(--color-text, #8a8888)" }}
+              >
+                (Optional)
+              </span>
+            </div>
             <input {...getFormControlProps("phone", false, "tel")} />
+            <p
+              className="mt-1 text-xs"
+              style={{ color: "var(--color-text, #8a8888)" }}
+            >
+              You can add your phone number later in your profile settings
+            </p>
           </div>
 
           <div className="mb-6">
-            <label
-              htmlFor="address"
-              className="block mb-2 text-sm font-medium"
-              style={{ color: "var(--color-title, #131313)" }}
-            >
-              Address
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label
+                htmlFor="address"
+                className="text-sm font-medium"
+                style={{ color: "var(--color-title, #131313)" }}
+              >
+                Address
+              </label>
+              <span
+                className="text-xs italic"
+                style={{ color: "var(--color-text, #8a8888)" }}
+              >
+                (Optional)
+              </span>
+            </div>
             <input {...getFormControlProps("address")} />
           </div>
 
