@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
@@ -20,29 +20,35 @@ const Header = () => {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
 
-  // Define queryParams for the products API call with search functionality
+  // Define queryParams with optimized search parameters
   const queryParams = {
     limit: 100,
     page: 1,
-    sort: "createdAt",
-    order: "desc",
-    // Add search parameters when searchTerm is present
-    ...(searchTerm && {
-      $or: [
-        { name: { $regex: searchTerm, $options: "i" } },
-        { description: { $regex: searchTerm, $options: "i" } },
-        { category: { $regex: searchTerm, $options: "i" } },
-      ],
-    }),
+    sort: "-createdAt",
+    fields: "id,name,description,category,price,images", // Only request needed fields
   };
 
   // Get all products using the API hook
   const { data, isLoading } = useGetAllProducts(queryParams);
 
-  // Use API data if available, or fallback to empty array if data is loading
-  const allProducts = data?.products || [];
+  // Client-side filtering based on search term - handling API response structure correctly
+  const filteredProducts = useMemo(() => {
+    // Properly access products from the API response
+    const allProducts = data?.products || [];
 
-  // Get current user from Redux store instead of React Query
+    if (!searchTerm || searchTerm.trim() === "") return allProducts;
+
+    const lowercasedSearch = searchTerm.toLowerCase();
+
+    return allProducts.filter(
+      (product) =>
+        product.name?.toLowerCase().includes(lowercasedSearch) ||
+        product.description?.toLowerCase().includes(lowercasedSearch) ||
+        product.category?.toLowerCase().includes(lowercasedSearch)
+    );
+  }, [data, searchTerm]);
+
+  // Get current user from Redux store
   const user = useSelector((state) => state.user.currentUser);
 
   // Redux store data for cart
@@ -114,7 +120,7 @@ const Header = () => {
     navigate("/signIn");
   };
 
-  // New function to handle checkout process
+  // Handle checkout process
   const handleCheckout = () => {
     if (!user) {
       // Show toast notification first
@@ -153,7 +159,7 @@ const Header = () => {
     }
   };
 
-  // Handle search input change
+  // Handle search input change - for client-side filtering
   const handleSearchChange = (term) => {
     setSearchTerm(term);
   };
@@ -167,11 +173,11 @@ const Header = () => {
 
   return (
     <div className="w-full sticky top-0 z-50">
-      {/* Use the SearchOverlay component */}
+      {/* Search Overlay - passing filteredProducts and loading state */}
       <SearchOverlay
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
-        products={allProducts}
+        products={filteredProducts}
         isLoading={isLoading}
         onSearchChange={handleSearchChange}
         searchTerm={searchTerm}
