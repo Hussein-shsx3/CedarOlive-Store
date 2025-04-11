@@ -4,6 +4,7 @@ import ScrollToTop from "./components/scroll/ScrollToTop";
 import { useGetCurrentUser } from "./api/users/userApi";
 import { useDispatch } from "react-redux";
 import { setCurrentUser } from "./redux/userSlice";
+import { checkExpiration } from "./redux/userSlice";
 import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
@@ -14,6 +15,7 @@ const Root = () => {
   const { data: currentUser, isSuccess } = useGetCurrentUser();
 
   useEffect(() => {
+    dispatch(checkExpiration());
     if (token && isSuccess && currentUser) {
       dispatch(setCurrentUser(currentUser));
     }
