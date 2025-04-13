@@ -8,6 +8,8 @@ import Product from "./pages/Product";
 import About from "./pages/About";
 import Blog from "./pages/Blog";
 import Contact from "./pages/Contact";
+import Cart from "./pages/Cart";
+import OrderSuccess from "./pages/OrderSuccess"; // Import the Order Success page
 
 // Auth Pages
 import SignUp from "./pages/authPages/SignUp";
@@ -37,6 +39,7 @@ import ChangePassword from "./components/profilePage/ChangePassword";
 // Not Found + Route Protection
 import NotFound from "./pages/NotFound";
 import PrivateRoute from "./components/Protected/PrivateRoute";
+import UserProtectedRoute from "./components/Protected/UserProtectedRoute";
 
 // Layout for Scroll Restoration
 import Root from "./Root";
@@ -44,12 +47,16 @@ import Root from "./Root";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Root />, // 👈 Layout with ScrollToTop
+    element: <Root />,
     children: [
       { index: true, element: <Home /> },
       {
         path: "profile",
-        element: <Profile />,
+        element: (
+          <UserProtectedRoute>
+            <Profile />
+          </UserProtectedRoute>
+        ),
         children: [
           { index: true, element: <PersonalInformation /> },
           { path: "orders", element: <Orders /> },
@@ -57,6 +64,22 @@ const router = createBrowserRouter([
           { path: "wishlist", element: <Wishlist /> },
           { path: "settings", element: <ChangePassword /> },
         ],
+      },
+      {
+        path: "checkout",
+        element: (
+          <UserProtectedRoute>
+            <Cart />
+          </UserProtectedRoute>
+        ),
+      },
+      {
+        path: "order-success",
+        element: (
+          <UserProtectedRoute>
+            <OrderSuccess />
+          </UserProtectedRoute>
+        ),
       },
       { path: "about", element: <About /> },
       { path: "contact", element: <Contact /> },

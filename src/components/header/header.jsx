@@ -453,7 +453,7 @@ const Header = () => {
                             <div className="flex-grow">
                               <h4 className="font-medium">{item.name}</h4>
                               <div className="flex justify-between items-center mt-2">
-                                <p className="text-gray-900">{item.price}</p>
+                                <p className="text-gray-900">{item.price}$</p>
                                 <div className="flex items-center">
                                   <input
                                     type="number"
@@ -489,7 +489,7 @@ const Header = () => {
                       onClick={handleCheckout}
                       disabled={cartItems.length === 0}
                     >
-                      Continue to Checkout
+                      Continue to Cart Page
                     </button>
                     {cartItems.length > 0 && (
                       <button
