@@ -82,10 +82,12 @@ const Cart = () => {
   }, [checkoutError, dispatch]);
 
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <div className="container mx-auto px-4 py-14">
-        <h1 className="text-3xl font-semibold mb-6">Shopping Cart</h1>
+      <div className="container mx-auto px-4 py-8 md:py-14 flex-grow">
+        <h1 className="text-2xl md:text-3xl font-semibold mb-4 md:mb-6">
+          Shopping Cart
+        </h1>
 
         {checkoutError && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -94,23 +96,115 @@ const Cart = () => {
         )}
 
         {cartItems.length === 0 ? (
-          <div className="text-center py-12">
-            <h2 className="text-2xl text-gray-500 mb-4">Your cart is empty</h2>
-            <p className="text-gray-400 mb-6">
+          <div className="text-center py-8 md:py-12">
+            <h2 className="text-xl md:text-2xl text-gray-500 mb-3 md:mb-4">
+              Your cart is empty
+            </h2>
+            <p className="text-gray-400 mb-4 md:mb-6">
               Add items to your cart to see them here
             </p>
             <Link
               to="/shop/all"
-              className="bg-secondary text-white py-3 px-6 hover:bg-[#aa7b5a] transition duration-200"
+              className="bg-secondary text-white py-2 px-4 md:py-3 md:px-6 hover:bg-[#aa7b5a] transition duration-200 rounded"
             >
               Continue Shopping
             </Link>
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
             {/* Cart Items */}
-            <div className="lg:w-2/3">
-              <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="lg:w-2/3 w-full">
+              {/* Mobile/Tablet View */}
+              <div className="lg:hidden">
+                {cartItems.map((item) => {
+                  const itemPrice = parseFloat(
+                    String(item.price).replace("$", "")
+                  );
+                  const itemTotal = itemPrice * item.quantity;
+
+                  return (
+                    <div
+                      key={item.id}
+                      className="bg-white rounded-lg shadow mb-4 p-4"
+                    >
+                      <div className="flex items-start">
+                        <div className="h-20 w-20 flex-shrink-0">
+                          <img
+                            className="h-20 w-20 object-cover rounded"
+                            src={item.image || "/api/placeholder/80/80"}
+                            alt={item.name}
+                          />
+                        </div>
+                        <div className="ml-4 flex-grow">
+                          <div className="text-sm font-medium text-gray-900 mb-1">
+                            {item.name}
+                          </div>
+                          <div className="flex flex-wrap gap-x-4 text-sm text-gray-500 mb-2">
+                            {item.color && <div>Color: {item.color}</div>}
+                            {item.size && <div>Size: {item.size}</div>}
+                            <div>Price: {item.price}</div>
+                          </div>
+
+                          <div className="flex justify-between items-center mt-2">
+                            <div className="flex items-center border rounded">
+                              <button
+                                className="px-2 py-1 text-gray-600 hover:text-gray-800"
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    item.id,
+                                    item.quantity - 1
+                                  )
+                                }
+                                disabled={item.quantity <= 1}
+                              >
+                                -
+                              </button>
+                              <input
+                                type="number"
+                                min="1"
+                                value={item.quantity}
+                                onChange={(e) =>
+                                  handleQuantityChange(
+                                    item.id,
+                                    parseInt(e.target.value) || 1
+                                  )
+                                }
+                                className="w-8 text-center border-0 focus:ring-0"
+                              />
+                              <button
+                                className="px-2 py-1 text-gray-600 hover:text-gray-800"
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    item.id,
+                                    item.quantity + 1
+                                  )
+                                }
+                              >
+                                +
+                              </button>
+                            </div>
+                            <div className="text-sm font-medium">
+                              Total: ${itemTotal.toFixed(2)}
+                            </div>
+                          </div>
+
+                          <div className="mt-3 text-right">
+                            <button
+                              onClick={() => handleRemoveItem(item.id)}
+                              className="text-red-600 hover:text-red-900 text-sm"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop View */}
+              <div className="hidden lg:block bg-white rounded-lg shadow overflow-hidden">
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
@@ -226,13 +320,16 @@ const Cart = () => {
                 </table>
               </div>
 
-              <div className="mt-4 flex justify-between">
-                <Link to="/shop/all" className="text-secondary hover:underline">
+              <div className="mt-4 flex flex-col sm:flex-row justify-between gap-3">
+                <Link
+                  to="/shop/all"
+                  className="text-center sm:text-left text-secondary hover:underline text-sm md:text-base"
+                >
                   Continue Shopping
                 </Link>
                 <button
                   onClick={handleClearCart}
-                  className="text-red-600 hover:text-red-800"
+                  className="text-center sm:text-right text-red-600 hover:text-red-800 text-sm md:text-base"
                 >
                   Clear Cart
                 </button>
@@ -240,8 +337,8 @@ const Cart = () => {
             </div>
 
             {/* Order Summary */}
-            <div className="lg:w-1/3">
-              <div className="bg-white p-6 rounded-lg shadow">
+            <div className="lg:w-1/3 w-full">
+              <div className="bg-white p-4 md:p-6 rounded-lg shadow">
                 <h2 className="text-lg font-medium mb-4">Order Summary</h2>
 
                 <div className="space-y-3 mb-4">
@@ -273,7 +370,7 @@ const Cart = () => {
                 <button
                   onClick={handleCheckout}
                   disabled={checkoutLoading || cartItems.length === 0}
-                  className="w-full bg-secondary text-white py-3 px-6 hover:bg-[#aa7b5a] transition duration-200 mb-3 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="w-full bg-secondary text-white py-3 px-6 hover:bg-[#aa7b5a] transition duration-200 mb-3 disabled:bg-gray-400 disabled:cursor-not-allowed rounded"
                 >
                   {checkoutLoading ? (
                     <span className="flex items-center justify-center">

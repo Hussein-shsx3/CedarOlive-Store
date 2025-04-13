@@ -183,7 +183,7 @@ const ContactMessages = () => {
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full py-5">
       {/* Success notification */}
       <AnimatePresence>
         {isSuccess && message && (

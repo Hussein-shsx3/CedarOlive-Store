@@ -160,7 +160,7 @@ const AdminDashboard = () => {
           >
             <div className="h-full flex flex-col">
               <div className="flex justify-between items-center p-4 border-b border-[#e2e8f0]">
-                <Link to="/admin/dashboard">
+                <Link to="/">
                   <img
                     src="https://cdn.prod.website-files.com/629f3db942b81a5f49ac7ba9/62c4923d2a7ada5125407697_logo.svg"
                     alt="Logo"
@@ -237,7 +237,7 @@ const AdminDashboard = () => {
       >
         <div className="flex items-center justify-between p-4 border-b border-[#e2e8f0]">
           {isSidebarOpen && (
-            <Link to="/admin/dashboard">
+            <Link to="/">
               <img
                 src="https://cdn.prod.website-files.com/629f3db942b81a5f49ac7ba9/62c4923d2a7ada5125407697_logo.svg"
                 alt="Logo"
