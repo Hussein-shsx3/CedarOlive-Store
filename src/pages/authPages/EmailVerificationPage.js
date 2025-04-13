@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { verifyEmail } from "../../api/auth/authApi";
 
 const EmailVerificationPage = () => {
@@ -50,7 +50,16 @@ const EmailVerificationPage = () => {
 
           {error && (
             <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-              {error}
+              <p>{error}</p>
+              <p className="mt-2 text-sm">
+                Did not receive the verification email or link expired?{" "}
+                <Link
+                  to="/resend-verification"
+                  className="text-[#a87048] hover:text-[#8a5c3d] font-medium underline"
+                >
+                  Resend verification email
+                </Link>
+              </p>
             </div>
           )}
 
@@ -112,8 +121,14 @@ const EmailVerificationPage = () => {
 
         <div className="text-center mt-6">
           <p className="text-sm text-[#8a8888]">
-            If you're having trouble verifying your email, please contact our
-            support team.
+            If you're having trouble verifying your email, please{" "}
+            <Link
+              to="/resend-verification"
+              className="text-[#a87048] hover:text-[#8a5c3d] font-medium"
+            >
+              request a new verification link
+            </Link>{" "}
+            or contact our support team.
           </p>
           <div className="mt-4 p-4 bg-[#ede5de] rounded-md border border-[#e2e8f0]">
             <p className="text-sm text-[#8a8888]">

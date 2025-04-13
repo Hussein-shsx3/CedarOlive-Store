@@ -26,7 +26,7 @@ const ResendVerification = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (email) {
-      await dispatch(resendVerification(email));
+      dispatch(resendVerification(email));
       setSubmitted(true);
     }
   };
