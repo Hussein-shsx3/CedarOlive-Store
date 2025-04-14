@@ -14,6 +14,7 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = cookies.get("token");
+  console.log(token);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -25,10 +26,10 @@ export const useGetCurrentUser = () =>
     queryKey: ["currentUser"],
     queryFn: async () => {
       const { data } = await api.get("/me");
-      const user = data.data;
-      return user;
+      return data.data;
     },
     enabled: !!cookies.get("token"),
+    staleTime: 5 * 60 * 1000, 
   });
 
 export const useGetAllUsers = () =>

@@ -18,7 +18,7 @@ const userPersistConfig = {
   storage,
   transforms: [
     expireReducer("user", {
-      expireSeconds: 86400, // 24 hours (1 day) in seconds
+      expireSeconds: 86400, // 24 hours
       expiredState: {
         currentUser: null,
         allUsers: [],
@@ -28,7 +28,7 @@ const userPersistConfig = {
         lastUpdated: null,
       },
       autoExpire: true,
-      key: "userExpire", // unique key for this expire transform
+      key: "userExpire",
     }),
   ],
 };
