@@ -50,7 +50,6 @@ const OrdersManagement = () => {
     staleTime: 60000,
     refetchOnWindowFocus: false,
   });
-  console.log(orders);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
