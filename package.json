@@ -15,6 +15,7 @@
     "ajv": "^8.17.1",
     "ajv-keywords": "^5.1.0",
     "axios": "^1.8.1",
+    "date-fns": "^4.1.0",
     "framer-motion": "^12.6.0",
     "lucide-react": "^0.477.0",
     "react": "^19.0.0",

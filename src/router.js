@@ -27,6 +27,7 @@ import Products from "./components/adminPage/Products";
 import EditUser from "./components/adminPage/customers/editUser";
 import ContactMessages from "./components/adminPage/ContactMessages";
 import ProductView from "./components/adminPage/products/ProductView";
+import OrdersManagement from "./components/adminPage/orders/OrdersManagement";
 
 // Profile
 import Profile from "./pages/profilePage/Profile";
@@ -74,7 +75,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "order-success",
+        path: "payment-success",
         element: (
           <UserProtectedRoute>
             <OrderSuccess />
@@ -100,7 +101,7 @@ const router = createBrowserRouter([
           { path: "users/edit/:userId", element: <EditUser /> },
           { path: "products", element: <Products /> },
           { path: "contactMessages", element: <ContactMessages /> },
-          { path: "orders", element: <Orders /> },
+          { path: "orders", element: <OrdersManagement /> },
           { path: "product/:productId", element: <ProductView /> },
         ],
       },

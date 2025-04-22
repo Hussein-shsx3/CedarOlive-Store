@@ -1,18 +1,23 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../components/header/header";
 import Footer from "../components/footer/footer";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { removeFromCart, updateQuantity, clearCart } from "../redux/cartSlice";
-import { createCheckoutSession } from "../api/payment/paymentApi";
-import { clearPaymentErrors } from "../redux/paymentSlice";
+import { createCheckoutSession } from "../api/order/orderApi";
+import { clearOrderState } from "../redux/orderSlice";
 
 const Cart = () => {
   const { cartItems, totalAmount } = useSelector((state) => state.cart);
-  const { currentUser } = useSelector((state) => state.user);
-  const { checkoutLoading, checkoutError, checkoutUrl } = useSelector(
-    (state) => state.payment
+  const checkoutLoading = useSelector(
+    (state) => state.orders?.loading || false
   );
+  const checkoutError = useSelector((state) => state.orders?.error || null);
+  const checkoutSession = useSelector(
+    (state) => state.orders?.checkoutSession || null
+  );
+  const [debugInfo, setDebugInfo] = useState(null);
+
   const dispatch = useDispatch();
 
   // Handle quantity change
@@ -31,50 +36,81 @@ const Cart = () => {
     dispatch(clearCart());
   };
 
-  // Handle checkout with Stripe
+  // Enhanced checkout function with debug logging
   const handleCheckout = async () => {
-    if (cartItems.length === 0) return;
+    if (cartItems.length === 0) {
+      setDebugInfo("Cart is empty. Cannot proceed to checkout.");
+      return;
+    }
 
-    // Clear any previous errors
-    dispatch(clearPaymentErrors());
+    // Log current state for debugging
+    setDebugInfo("Preparing checkout data...");
 
-    // Prepare line items for Stripe
-    const lineItems = cartItems.map((item) => ({
-      price_data: {
-        currency: "usd",
-        product_data: {
+    try {
+      // Prepare products array for the backend
+      const products = cartItems.map((item) => {
+        // First try to get numeric price
+        const price = parseFloat(String(item.price).replace("$", ""));
+
+        return {
+          id: item.id, // Make sure this ID matches your product ID in the database
           name: item.name,
-          images: item.image ? [item.image] : [],
-        },
-        unit_amount: parseFloat(String(item.price).replace("$", "")) * 100, // Convert to cents
-      },
-      quantity: item.quantity,
-    }));
+          price: price, // Convert price string to float
+          quantity: item.quantity,
+          // Include image if available
+          image: item.image || null,
+        };
+      });
 
-    // Create checkout data
-    const checkoutData = {
-      lineItems,
-      customer_email: currentUser?.email,
-      success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${window.location.origin}/cart`,
-    };
+      // Log what we're about to send
+      console.log("Checkout data being sent:", { products });
+      setDebugInfo(`Sending checkout data with ${products.length} products...`);
 
-    // Use the createCheckoutSession thunk
-    dispatch(createCheckoutSession(checkoutData));
+      // Create checkout data
+      const checkoutData = {
+        products,
+      };
+
+      // Dispatch the action
+      const result = await dispatch(
+        createCheckoutSession(checkoutData)
+      ).unwrap();
+
+      // Handle the result immediately to ensure redirect happens
+      console.log("Checkout response:", result);
+
+      if (result && result.url) {
+        setDebugInfo(`Checkout successful! Redirecting to ${result.url}...`);
+        // Add a small delay for the UI to update before redirecting
+        setTimeout(() => {
+          window.location.href = result.url;
+        }, 100);
+      } else {
+        setDebugInfo("Error: Checkout session URL not found in response");
+        console.error("Missing URL in checkout response:", result);
+      }
+    } catch (error) {
+      console.error("Error in checkout process:", error);
+      setDebugInfo(`Checkout error: ${error.message || JSON.stringify(error)}`);
+    }
   };
 
-  // Redirect to Stripe when checkout URL is available
+  // Keep this as a backup to ensure redirection happens if state updates
   useEffect(() => {
-    if (checkoutUrl) {
-      window.location.href = checkoutUrl;
+    if (checkoutSession?.url) {
+      console.log("Redirecting to:", checkoutSession.url);
+      setDebugInfo(
+        `Redirecting to payment page via effect: ${checkoutSession.url}`
+      );
+      window.location.href = checkoutSession.url;
     }
-  }, [checkoutUrl]);
+  }, [checkoutSession]);
 
   // Clear error message after 5 seconds
   useEffect(() => {
     if (checkoutError) {
       const timer = setTimeout(() => {
-        dispatch(clearPaymentErrors());
+        dispatch(clearOrderState());
       }, 5000);
 
       return () => clearTimeout(timer);
@@ -88,6 +124,14 @@ const Cart = () => {
         <h1 className="text-2xl md:text-3xl font-semibold mb-4 md:mb-6">
           Shopping Cart
         </h1>
+
+        {/* Debug info panel (only visible when there's debug info) */}
+        {debugInfo && (
+          <div className="bg-blue-50 border border-blue-300 text-blue-800 px-4 py-3 rounded mb-4">
+            <p className="font-bold">Debug Info:</p>
+            <pre className="text-xs overflow-x-auto">{debugInfo}</pre>
+          </div>
+        )}
 
         {checkoutError && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">

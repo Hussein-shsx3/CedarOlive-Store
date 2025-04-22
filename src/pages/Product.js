@@ -204,12 +204,12 @@ const Product = () => {
                   {product.brand}
                 </span>
                 {product.availability ? (
-                  <span className="inline-block ml-2 text-green-600 text-sm font-medium flex items-center">
+                  <span className="inline-block ml-2 text-green-600 text-sm font-medium items-center">
                     <span className="w-2 h-2 bg-green-600 rounded-full mr-1"></span>
                     In Stock
                   </span>
                 ) : (
-                  <span className="inline-block ml-2 text-red-600 text-sm font-medium flex items-center">
+                  <span className="inline-block ml-2 text-red-600 text-sm font-medium items-center">
                     <span className="w-2 h-2 bg-red-600 rounded-full mr-1"></span>
                     Out of Stock
                   </span>
