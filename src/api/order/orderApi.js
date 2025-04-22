@@ -88,7 +88,7 @@ export const updateOrder = createAsyncThunk(
   "orders/updateOrder",
   async ({ orderId, updateData }, { rejectWithValue }) => {
     try {
-      const { data } = await api.put(`/api/v1/orders/${orderId}`, updateData);
+      const { data } = await api.patch(`/api/v1/orders/${orderId}`, updateData);
       return data;
     } catch (error) {
       return rejectWithValue(
