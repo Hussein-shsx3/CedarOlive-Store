@@ -8,7 +8,6 @@ import {
   Shield,
   Lock,
   AlertTriangle,
-  Bell,
   LogOut,
 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
@@ -144,17 +143,6 @@ const AccountSettings = () => {
         >
           <Shield size={18} className="mr-2" />
           Security
-        </button>
-        <button
-          className={`px-8 py-3 flex items-center ${
-            activeTab === "notifications"
-              ? "border-b-2 border-amber-700 text-amber-700"
-              : "text-gray-600 hover:text-amber-700"
-          }`}
-          onClick={() => setActiveTab("notifications")}
-        >
-          <Bell size={18} className="mr-2" />
-          Notifications
         </button>
       </div>
 
@@ -314,87 +302,6 @@ const AccountSettings = () => {
             <button className="flex items-center justify-center px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
               <LogOut size={18} className="mr-2" />
               Sign Out from All Devices
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Notifications Tab */}
-      {activeTab === "notifications" && (
-        <div className="bg-white p-8 rounded-lg shadow-sm">
-          <h3 className="text-lg font-medium text-gray-800 mb-6">
-            Notification Preferences
-          </h3>
-
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-800 font-medium">Order Updates</p>
-                <p className="text-sm text-gray-500">
-                  Get notified about your order status changes
-                </p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  defaultChecked
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-700"></div>
-              </label>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-800 font-medium">Special Offers</p>
-                <p className="text-sm text-gray-500">
-                  Receive notifications about discounts and promotions
-                </p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  defaultChecked
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-700"></div>
-              </label>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-800 font-medium">New Products</p>
-                <p className="text-sm text-gray-500">
-                  Be the first to know about new product arrivals
-                </p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" className="sr-only peer" />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-700"></div>
-              </label>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-800 font-medium">Marketing Emails</p>
-                <p className="text-sm text-gray-500">
-                  Receive our newsletter and marketing communications
-                </p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  defaultChecked
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-700"></div>
-              </label>
-            </div>
-          </div>
-
-          <div className="mt-8">
-            <button className="px-6 py-3 bg-amber-700 text-white rounded-md font-medium hover:bg-amber-800 transition-colors">
-              Save Preferences
             </button>
           </div>
         </div>

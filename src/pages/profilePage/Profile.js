@@ -6,7 +6,6 @@ import Cookies from "universal-cookie";
 import {
   Camera,
   Package,
-  CreditCard,
   Heart,
   LogOut,
   User,
@@ -162,22 +161,6 @@ const Profile = () => {
               >
                 <Package size={20} className="mr-2" />
                 <span className="truncate">Orders</span>
-              </Link>
-              <Link
-                to="/profile/payment"
-                className={`flex-1 md:flex-none px-5 py-4 font-medium text-base flex items-center justify-center md:justify-start ${
-                  location.pathname === "/profile/payment" ? "border-b-2" : ""
-                }`}
-                style={{
-                  color:
-                    location.pathname === "/profile/payment"
-                      ? "var(--color-secondary)"
-                      : "var(--color-text)",
-                  borderColor: "var(--color-secondary)",
-                }}
-              >
-                <CreditCard size={20} className="mr-2" />
-                <span className="truncate">Payment</span>
               </Link>
               <Link
                 to="/profile/wishlist"

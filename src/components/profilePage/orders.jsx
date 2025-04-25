@@ -1,91 +1,240 @@
 import React from "react";
 import { Package } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { getMyOrders } from "../../api/order/orderApi";
+import { format } from "date-fns";
 
-const Orders = ({ user }) => {
+const Orders = () => {
+  const navigate = useNavigate();
+
+  const {
+    data: orders,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["myOrders"],
+    queryFn: getMyOrders,
+  });
+
+  const formatDate = (dateString) => {
+    try {
+      return format(new Date(dateString), "MMMM d, yyyy");
+    } catch (e) {
+      return "Invalid date";
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case "delivered":
+      case "deleviered": // Handle potential typo in your model enum
+        return {
+          bg: "var(--color-success, #4CAF50)",
+          text: "white",
+        };
+      case "placed":
+        return {
+          bg: "var(--color-info, #2196F3)",
+          text: "white",
+        };
+      case "packed":
+        return {
+          bg: "var(--color-primary, #9C27B0)",
+          text: "white",
+        };
+      case "shipped":
+        return {
+          bg: "var(--color-warning, #FF9800)",
+          text: "white",
+        };
+      case "canceled":
+        return {
+          bg: "var(--color-error, #F44336)",
+          text: "white",
+        };
+      default:
+        return {
+          bg: "var(--color-primary)",
+          text: "var(--color-secondary)",
+        };
+    }
+  };
+
+  const handleBrowseProducts = () => {
+    navigate("/products");
+  };
+
+  if (isLoading) {
+    return (
+      <div className="py-12 text-center" style={{ color: "var(--color-text)" }}>
+        <div className="animate-pulse">
+          <div className="h-8 w-48 bg-gray-200 rounded mb-8 mx-auto"></div>
+          <div className="h-32 w-full max-w-lg bg-gray-200 rounded mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div
+        className="py-12 text-center"
+        style={{ color: "var(--color-error, red)" }}
+      >
+        <h2 className="text-2xl font-semibold mb-4">Error Loading Orders</h2>
+        <p>
+          {error?.message ||
+            "Unable to load your orders. Please try again later."}
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-6 py-2 rounded-md text-base font-medium"
+          style={{
+            backgroundColor: "var(--color-secondary)",
+            color: "white",
+          }}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div>
+    <div className="container mx-auto px-4 md:px-6 py-8">
       <h2
         className="text-2xl font-semibold mb-8"
         style={{ color: "var(--color-title)" }}
       >
         Order History
       </h2>
-      {user?.orders && user.orders.length > 0 ? (
+      {orders && orders.length > 0 ? (
         <div className="space-y-6">
-          {/* Order list would go here */}
-          <div
-            className="p-6 rounded-md border"
-            style={{ borderColor: "var(--color-border)" }}
-          >
-            <p
-              className="font-medium text-lg"
-              style={{ color: "var(--color-title)" }}
+          {orders.map((order) => (
+            <div
+              key={order._id}
+              className="p-4 md:p-6 rounded-md border transition-all hover:shadow-md"
+              style={{ borderColor: "var(--color-border)" }}
             >
-              Order #12345
-            </p>
-            <p
-              className="text-base mb-4"
-              style={{ color: "var(--color-text)" }}
-            >
-              Placed on March 15, 2025
-            </p>
-            <div className="flex justify-between items-center">
-              <span
-                className="px-3 py-1 text-sm rounded-full"
-                style={{
-                  backgroundColor: "var(--color-primary)",
-                  color: "var(--color-secondary)",
-                }}
+              <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-4">
+                <div>
+                  <p
+                    className="font-medium text-lg"
+                    style={{ color: "var(--color-title)" }}
+                  >
+                    Order #{order._id?.substring(0, 8) || "N/A"}
+                  </p>
+                  <p
+                    className="text-sm md:text-base"
+                    style={{ color: "var(--color-text)" }}
+                  >
+                    Placed on {formatDate(order.createdAt)}
+                  </p>
+                  <p
+                    className="text-sm mt-1"
+                    style={{ color: "var(--color-text-light)" }}
+                  >
+                    Payment: {order.paymentMethod}
+                    {order.isPaid ? " (Paid)" : " (Unpaid)"}
+                  </p>
+                </div>
+                <div className="mt-2 md:mt-0 text-right">
+                  <p
+                    className="text-base font-medium"
+                    style={{ color: "var(--color-title)" }}
+                  >
+                    Total: ${order.totalPrice?.toFixed(2) || "0.00"}
+                  </p>
+                  <div className="flex justify-end mt-1">
+                    <span
+                      className="px-3 py-1 text-sm rounded-full"
+                      style={{
+                        backgroundColor: getStatusColor(order.orderStatus).bg,
+                        color: getStatusColor(order.orderStatus).text,
+                      }}
+                    >
+                      {order.orderStatus || "Placed"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Shipping Address */}
+              <div
+                className="mt-3 text-sm"
+                style={{ color: "var(--color-text)" }}
               >
-                Delivered
-              </span>
-              <button
-                className="text-base font-medium"
-                style={{ color: "var(--color-secondary)" }}
+                <p>
+                  <span className="font-medium">Shipping: </span>
+                  {order.shippingAddress?.address},{" "}
+                  {order.shippingAddress?.city},{" "}
+                  {order.shippingAddress?.country}
+                  {order.shippingAddress?.postalCode &&
+                    ` - ${order.shippingAddress.postalCode}`}
+                </p>
+                {order.isDelivered && order.deliveredAt && (
+                  <p
+                    className="mt-1"
+                    style={{ color: "var(--color-success, green)" }}
+                  >
+                    Delivered on {formatDate(order.deliveredAt)}
+                  </p>
+                )}
+              </div>
+
+              {/* Order Items */}
+              <div
+                className="mt-4 pt-4 border-t"
+                style={{ borderColor: "var(--color-border-light, #eee)" }}
               >
-                View Details
-              </button>
+                <p
+                  className="text-sm mb-2"
+                  style={{ color: "var(--color-text-light)" }}
+                >
+                  {order.orderItems?.length || 0}{" "}
+                  {order.orderItems?.length === 1 ? "item" : "items"}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {order.orderItems?.slice(0, 3).map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center text-sm"
+                      style={{ color: "var(--color-text)" }}
+                    >
+                      <span>{item.name || `Product #${idx + 1}`}</span>
+                      <span
+                        className="ml-1 text-xs"
+                        style={{ color: "var(--color-text-light)" }}
+                      >
+                        ({item.quantity}x ${item.price})
+                      </span>
+                      {idx < Math.min(order.orderItems.length, 3) - 1 && (
+                        <span className="mx-1">•</span>
+                      )}
+                    </div>
+                  ))}
+                  {order.orderItems?.length > 3 && (
+                    <span
+                      className="text-sm"
+                      style={{ color: "var(--color-text-light)" }}
+                    >
+                      +{order.orderItems.length - 3} more
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-          <div
-            className="p-6 rounded-md border"
-            style={{ borderColor: "var(--color-border)" }}
-          >
-            <p
-              className="font-medium text-lg"
-              style={{ color: "var(--color-title)" }}
-            >
-              Order #12346
-            </p>
-            <p
-              className="text-base mb-4"
-              style={{ color: "var(--color-text)" }}
-            >
-              Placed on March 10, 2025
-            </p>
-            <div className="flex justify-between items-center">
-              <span
-                className="px-3 py-1 text-sm rounded-full"
-                style={{
-                  backgroundColor: "var(--color-primary)",
-                  color: "var(--color-secondary)",
-                }}
-              >
-                Processing
-              </span>
-              <button
-                className="text-base font-medium"
-                style={{ color: "var(--color-secondary)" }}
-              >
-                View Details
-              </button>
-            </div>
-          </div>
+          ))}
         </div>
       ) : (
         <div
-          className="text-center py-12"
-          style={{ color: "var(--color-text)" }}
+          className="text-center py-12 max-w-lg mx-auto border rounded-lg"
+          style={{
+            color: "var(--color-text)",
+            borderColor: "var(--color-border)",
+          }}
         >
           <Package
             size={64}
@@ -98,8 +247,11 @@ const Orders = ({ user }) => {
           >
             No orders yet
           </h3>
-          <p className="mb-6 text-lg">You haven't placed any orders yet.</p>
+          <p className="mb-6 text-lg px-4">
+            You haven't placed any orders yet.
+          </p>
           <button
+            onClick={handleBrowseProducts}
             className="px-6 py-3 rounded-md text-base font-medium"
             style={{
               backgroundColor: "var(--color-secondary)",

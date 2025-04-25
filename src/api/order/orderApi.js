@@ -1,9 +1,7 @@
 import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import Cookies from "universal-cookie";
-
 const cookies = new Cookies();
-
 // Axios instance
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || "",
@@ -12,7 +10,6 @@ const api = axios.create({
   },
   withCredentials: true,
 });
-
 // Attach token to requests
 api.interceptors.request.use(
   (config) => {
@@ -27,7 +24,6 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
 // Add response interceptor for debugging
 api.interceptors.response.use(
   (response) => {
@@ -38,13 +34,17 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 /* ------------------ React Query Fetchers (for v5) ------------------ */
-
 // getAllOrders - fetches all orders
 export const getAllOrders = async () => {
   const { data } = await api.get("/api/v1/orders");
   return data.data;
+};
+
+// getMyOrders - fetches the current user's orders
+export const getMyOrders = async () => {
+  const { data } = await api.get("/api/v1/orders/my-orders");
+  return data.data.orders;
 };
 
 // getOrder - fetches one order
@@ -54,9 +54,7 @@ export const getOrder = async ({ queryKey }) => {
   const { data } = await api.get(`/api/v1/orders/${orderId}`);
   return data;
 };
-
 /* ------------------ Redux Toolkit Async Thunks ------------------ */
-
 // createCheckoutSession - creates a checkout session
 export const createCheckoutSession = createAsyncThunk(
   "orders/createCheckoutSession",
@@ -82,7 +80,6 @@ export const createCheckoutSession = createAsyncThunk(
     }
   }
 );
-
 // updateOrder - updates an order
 export const updateOrder = createAsyncThunk(
   "orders/updateOrder",
@@ -99,7 +96,6 @@ export const updateOrder = createAsyncThunk(
     }
   }
 );
-
 // deleteOrder - deletes an order
 export const deleteOrder = createAsyncThunk(
   "orders/deleteOrder",

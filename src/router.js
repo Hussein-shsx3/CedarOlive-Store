@@ -34,8 +34,7 @@ import Profile from "./pages/profilePage/Profile";
 import PersonalInformation from "./components/profilePage/personalInformation";
 import Wishlist from "./components/profilePage/wishlist";
 import Orders from "./components/profilePage/orders";
-import Payment from "./components/profilePage/payment";
-import ChangePassword from "./components/profilePage/ChangePassword";
+import ChangePassword from "./components/profilePage/AccountSettings";
 
 // Not Found + Route Protection
 import NotFound from "./pages/NotFound";
@@ -61,7 +60,6 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <PersonalInformation /> },
           { path: "orders", element: <Orders /> },
-          { path: "payment", element: <Payment /> },
           { path: "wishlist", element: <Wishlist /> },
           { path: "settings", element: <ChangePassword /> },
         ],
