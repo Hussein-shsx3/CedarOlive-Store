@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   ShoppingCart,
   Users,
   DollarSign,
+  Loader,
+  AlertCircle,
 } from "lucide-react";
 import {
   LineChart,
@@ -13,6 +15,9 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useQuery } from "@tanstack/react-query";
+import { useGetAllUsers } from "../../api/users/userApi";
+import { getAllOrders } from "../../api/order/orderApi";
 
 const DashboardCard = ({ icon, title, value, change, positive }) => (
   <div className="bg-white rounded-lg shadow-md p-5 hover:shadow-lg transition-shadow">
@@ -21,46 +26,137 @@ const DashboardCard = ({ icon, title, value, change, positive }) => (
       <div className="text-right">
         <h3 className="text-sm text-[#8a8888] mb-1">{title}</h3>
         <p className="text-2xl font-bold text-[#131313]">{value}</p>
-        <p
-          className={`text-xs ${positive ? "text-green-600" : "text-red-600"}`}
-        >
-          {positive ? "↑" : "↓"} {change}% from last month
-        </p>
+        {change !== undefined && (
+          <p
+            className={`text-xs ${
+              positive ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {positive ? "↑" : "↓"} {change}% from last month
+          </p>
+        )}
       </div>
     </div>
   </div>
 );
 
 const Dashboard = () => {
-  const salesData = [
-    { name: "Jan", sales: 4000 },
-    { name: "Feb", sales: 3000 },
-    { name: "Mar", sales: 5000 },
-    { name: "Apr", sales: 4500 },
-    { name: "May", sales: 6000 },
-    { name: "Jun", sales: 5500 },
-  ];
+  // Fetch users data
+  const {
+    data: users,
+    isLoading: isUsersLoading,
+    isError: isUsersError,
+  } = useGetAllUsers();
 
-  const recentOrders = [
-    {
-      id: "#12345",
-      customer: "John Doe",
-      total: "$250.00",
-      status: "Completed",
-    },
-    {
-      id: "#12346",
-      customer: "Jane Smith",
-      total: "$175.50",
-      status: "Processing",
-    },
-    {
-      id: "#12347",
-      customer: "Mike Johnson",
-      total: "$300.75",
-      status: "Shipped",
-    },
-  ];
+  // Fetch orders data
+  const {
+    data: orders,
+    isLoading: isOrdersLoading,
+    isError: isOrdersError,
+    error: ordersError,
+  } = useQuery({
+    queryKey: ["getAllOrders"],
+    queryFn: getAllOrders,
+  });
+
+  // Calculate total revenue from orders
+  const totalRevenue = useMemo(() => {
+    if (!orders) return 0;
+    return orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
+  }, [orders]);
+
+  // Format total revenue as currency
+  const formattedRevenue = useMemo(() => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+    }).format(totalRevenue);
+  }, [totalRevenue]);
+
+  // Prepare data for the sales chart (group by month)
+  const salesData = useMemo(() => {
+    if (!orders) return [];
+
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const monthlySales = Array(12).fill(0);
+
+    orders.forEach((order) => {
+      if (order.createdAt && order.isPaid) {
+        const date = new Date(order.createdAt);
+        const month = date.getMonth();
+        monthlySales[month] += order.totalPrice || 0;
+      }
+    });
+
+    return monthNames.map((name, index) => ({
+      name,
+      sales: monthlySales[index],
+    }));
+  }, [orders]);
+
+  // Get recently placed orders
+  const recentOrders = useMemo(() => {
+    if (!orders) return [];
+
+    return orders
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 5)
+      .map((order) => ({
+        id: order._id?.substring(0, 6) || "N/A",
+        customer: order.user?.name || "Anonymous",
+        total: new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(order.totalPrice || 0),
+        status: order.orderStatus || "Processing",
+      }));
+  }, [orders]);
+
+  // Loading state for the entire dashboard
+  if (isUsersLoading || isOrdersLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64">
+        <Loader className="w-12 h-12 text-[#A0522D] animate-spin mb-4" />
+        <p className="text-lg text-[#8a8888]">Loading dashboard data...</p>
+      </div>
+    );
+  }
+
+  // Error state
+  if (isUsersError || isOrdersError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-center">
+        <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+        <h2 className="text-xl font-semibold text-[#131313] mb-2">
+          Error Loading Dashboard
+        </h2>
+        <p className="text-[#8a8888] mb-4">
+          {ordersError?.message ||
+            "Unable to load dashboard data. Please try again later."}
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-[#A0522D] text-white rounded-md hover:bg-[#8B4513]"
+        >
+          Refresh
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -71,21 +167,21 @@ const Dashboard = () => {
         <DashboardCard
           icon={<DollarSign className="w-6 h-6 text-[#A0522D]" />}
           title="Total Revenue"
-          value="$45,231.89"
+          value={formattedRevenue}
           change={12.5}
           positive={true}
         />
         <DashboardCard
           icon={<ShoppingCart className="w-6 h-6 text-[#A0522D]" />}
           title="Total Orders"
-          value="452"
+          value={orders?.length || 0}
           change={8.2}
           positive={true}
         />
         <DashboardCard
           icon={<Users className="w-6 h-6 text-[#A0522D]" />}
-          title="New Customers"
-          value="123"
+          title="Total Customers"
+          value={users?.length || 0}
           change={5.3}
           positive={false}
         />
@@ -107,6 +203,7 @@ const Dashboard = () => {
                 border: "1px solid #e2e8f0",
                 borderRadius: "8px",
               }}
+              formatter={(value) => [`$${value.toFixed(2)}`, "Sales"]}
             />
             <Line
               type="monotone"
@@ -127,44 +224,58 @@ const Dashboard = () => {
           </h2>
           <button className="text-[#A0522D] hover:underline">View All</button>
         </div>
-        <table className="w-full text-left">
-          <thead className="border-b border-[#e2e8f0]">
-            <tr>
-              <th className="py-2 text-sm text-[#8a8888]">Order ID</th>
-              <th className="py-2 text-sm text-[#8a8888]">Customer</th>
-              <th className="py-2 text-sm text-[#8a8888]">Total</th>
-              <th className="py-2 text-sm text-[#8a8888]">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentOrders.map((order) => (
-              <tr
-                key={order.id}
-                className="border-b border-[#e2e8f0] last:border-b-0 hover:bg-[#f7f3f3]"
-              >
-                <td className="py-3 text-sm">{order.id}</td>
-                <td className="py-3 text-sm">{order.customer}</td>
-                <td className="py-3 text-sm font-semibold">{order.total}</td>
-                <td className="py-3">
-                  <span
-                    className={`
-                    text-xs px-2 py-1 rounded-full
-                    ${
-                      order.status === "Completed"
-                        ? "bg-green-100 text-green-800"
-                        : order.status === "Processing"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-blue-100 text-blue-800"
-                    }
-                  `}
-                  >
-                    {order.status}
-                  </span>
-                </td>
+
+        {recentOrders.length > 0 ? (
+          <table className="w-full text-left">
+            <thead className="border-b border-[#e2e8f0]">
+              <tr>
+                <th className="py-2 text-sm text-[#8a8888]">Order ID</th>
+                <th className="py-2 text-sm text-[#8a8888]">Customer</th>
+                <th className="py-2 text-sm text-[#8a8888]">Total</th>
+                <th className="py-2 text-sm text-[#8a8888]">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {recentOrders.map((order) => (
+                <tr
+                  key={order.id}
+                  className="border-b border-[#e2e8f0] last:border-b-0 hover:bg-[#f7f3f3]"
+                >
+                  <td className="py-3 text-sm">#{order.id}</td>
+                  <td className="py-3 text-sm">{order.customer}</td>
+                  <td className="py-3 text-sm font-semibold">{order.total}</td>
+                  <td className="py-3">
+                    <span
+                      className={`
+                      text-xs px-2 py-1 rounded-full
+                      ${
+                        order.status === "delivered" ||
+                        order.status === "Delivered"
+                          ? "bg-green-100 text-green-800"
+                          : order.status === "placed" ||
+                            order.status === "Processing"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : order.status === "shipped" ||
+                            order.status === "Shipped"
+                          ? "bg-blue-100 text-blue-800"
+                          : order.status === "canceled" ||
+                            order.status === "Canceled"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-gray-100 text-gray-800"
+                      }
+                    `}
+                    >
+                      {order.status.charAt(0).toUpperCase() +
+                        order.status.slice(1)}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="text-center py-8 text-[#8a8888]">No orders found</div>
+        )}
       </div>
     </div>
   );

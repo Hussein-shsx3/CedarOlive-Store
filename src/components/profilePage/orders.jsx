@@ -196,33 +196,53 @@ const Orders = () => {
                   {order.orderItems?.length || 0}{" "}
                   {order.orderItems?.length === 1 ? "item" : "items"}
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  {order.orderItems?.slice(0, 3).map((item, idx) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {order.orderItems?.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center text-sm"
-                      style={{ color: "var(--color-text)" }}
+                      className="flex items-center p-2 rounded-md border"
+                      style={{ borderColor: "var(--color-border-light)" }}
                     >
-                      <span>{item.name || `Product #${idx + 1}`}</span>
-                      <span
-                        className="ml-1 text-xs"
-                        style={{ color: "var(--color-text-light)" }}
-                      >
-                        ({item.quantity}x ${item.price})
-                      </span>
-                      {idx < Math.min(order.orderItems.length, 3) - 1 && (
-                        <span className="mx-1">•</span>
-                      )}
+                      {/* Product Image */}
+                      <div className="flex-shrink-0 w-16 h-16 mr-3 rounded-md overflow-hidden bg-gray-100">
+                        {item.product &&
+                        item.product.images &&
+                        item.product.images.length > 0 ? (
+                          <img
+                            src={item.product.images[0]}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "/placeholder-product.png"; // Fallback image
+                            }}
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center w-full h-full bg-gray-200">
+                            <Package
+                              size={24}
+                              style={{ color: "var(--color-icons)" }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      {/* Product Details */}
+                      <div className="flex-grow">
+                        <p
+                          className="font-medium text-sm"
+                          style={{ color: "var(--color-title)" }}
+                        >
+                          {item.name || `Product #${idx + 1}`}
+                        </p>
+                        <p
+                          className="text-xs"
+                          style={{ color: "var(--color-text-light)" }}
+                        >
+                          {item.quantity}x ${item.price}
+                        </p>
+                      </div>
                     </div>
                   ))}
-                  {order.orderItems?.length > 3 && (
-                    <span
-                      className="text-sm"
-                      style={{ color: "var(--color-text-light)" }}
-                    >
-                      +{order.orderItems.length - 3} more
-                    </span>
-                  )}
                 </div>
               </div>
             </div>

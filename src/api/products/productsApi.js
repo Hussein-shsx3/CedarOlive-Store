@@ -24,27 +24,21 @@ export const useGetAllProducts = (queryParams = {}) =>
   useQuery({
     queryKey: ["products", queryParams],
     queryFn: async () => {
-      // Create a new object to avoid modifying the original
       const params = { ...queryParams };
 
-      // Special handling for search parameters
       if (params.$or) {
         try {
-          // If $or is already a string, use it directly (it's already stringified)
           if (typeof params.$or === "string") {
-            // Make sure it's properly encoded
             params.$or = encodeURIComponent(params.$or);
           } else {
-            // If it's still an object, stringify and encode it
             params.$or = encodeURIComponent(JSON.stringify(params.$or));
           }
         } catch (error) {
           console.error("Error processing search parameters:", error);
-          delete params.$or; // Remove the problematic parameter if there's an error
+          delete params.$or; 
         }
       }
 
-      // Convert parameters to query string
       const queryString =
         Object.keys(params).length > 0
           ? `?${new URLSearchParams(params).toString()}`
