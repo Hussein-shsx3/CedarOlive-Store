@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/cartSlice";
-import { toast } from "react-toastify";
 import Header from "../components/header/header";
 import Footer from "../components/footer/footer";
 import Explore from "../components/productPage/explore";
 import Reviews from "../components/productPage/Reviews";
 import { useGetProductById } from "../api/products/productsApi";
-import { ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
   Minus,
@@ -128,18 +127,6 @@ const Product = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        className="mt-16"
-      />
       <Header />
 
       <section className="container mx-auto px-4 py-8 my-4 flex-grow">

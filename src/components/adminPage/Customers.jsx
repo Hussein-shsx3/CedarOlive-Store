@@ -11,8 +11,7 @@ import {
   ChevronRight,
   Trash2,
 } from "lucide-react";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import {
   Dialog,
   DialogActions,
@@ -148,8 +147,6 @@ const Customers = () => {
 
   return (
     <div className="space-y-6 p-4 md:p-6">
-      <ToastContainer />
-
       {/* Header & Search */}
       <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
         <h1 className="text-2xl md:text-3xl font-bold text-[#131313] text-center md:text-left">

@@ -13,7 +13,6 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { toast } from "react-toastify";
-import { ToastContainer } from "react-toastify";
 
 const EditUserPage = () => {
   const { userId } = useParams();
@@ -117,7 +116,6 @@ const EditUserPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <ToastContainer position="top-right" autoClose={3000} />
 
       <div className="max-w-4xl mx-auto">
         <button

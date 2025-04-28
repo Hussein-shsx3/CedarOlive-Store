@@ -1,9 +1,6 @@
 import React, { useCallback } from "react";
 import { Heart, ShoppingBag } from "lucide-react";
-import {
-  useGetMyWishlist,
-  removeFromWishlist,
-} from "../../api/wishlist/wishlistApi";
+import { useGetMyWishlist } from "../../api/wishlist/wishlistApi";
 import Product from "../product/product";
 import { useNavigate } from "react-router-dom";
 
@@ -32,7 +29,7 @@ const Wishlist = () => {
   );
 
   const handleBrowseProducts = () => {
-    navigate("/products");
+    navigate("/shop/All");
   };
 
   if (isLoading) {
@@ -63,7 +60,7 @@ const Wishlist = () => {
 
         <button
           onClick={handleBrowseProducts}
-          className="px-4 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-2"
+          className="px-4 py-2 rounded-md text-sm font-medium bg-secondary text-white transition-colors flex items-center gap-2"
         >
           <ShoppingBag size={16} />
           Browse More
@@ -109,7 +106,7 @@ const Wishlist = () => {
           </p>
           <button
             onClick={handleBrowseProducts}
-            className="px-6 py-3 rounded-md text-base font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-2 mx-auto"
+            className="px-6 py-3 rounded-md text-base font-medium bg-secondary text-white transition-colors flex items-center gap-2 mx-auto"
           >
             <ShoppingBag size={18} />
             Browse Products

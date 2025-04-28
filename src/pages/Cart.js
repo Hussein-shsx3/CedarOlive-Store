@@ -392,7 +392,7 @@ const Cart = () => {
                       {cartItems.reduce((sum, item) => sum + item.quantity, 0)}{" "}
                       items)
                     </span>
-                    <span>${totalAmount.toFixed(2)}</span>
+                    <span>${totalAmount?.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Shipping</span>
@@ -407,7 +407,7 @@ const Cart = () => {
                 <div className="border-t pt-4 mb-6">
                   <div className="flex justify-between font-semibold">
                     <span>Total</span>
-                    <span>${totalAmount.toFixed(2)}</span>
+                    <span>${totalAmount?.toFixed(2)}</span>
                   </div>
                 </div>
 

@@ -6,6 +6,8 @@ import { useDispatch } from "react-redux";
 import { setCurrentUser, checkExpiration } from "./redux/userSlice";
 import { logout } from "./redux/authSlice";
 import Cookies from "universal-cookie";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const cookies = new Cookies();
 
@@ -29,6 +31,18 @@ const Root = () => {
 
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        className="mt-16"
+      />
       <ScrollToTop />
       <Outlet />
     </>

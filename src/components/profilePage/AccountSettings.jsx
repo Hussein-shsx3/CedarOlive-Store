@@ -10,7 +10,7 @@ import {
   AlertTriangle,
   LogOut,
 } from "lucide-react";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { logout } from "../../redux/authSlice";
 import Cookies from "universal-cookie";
 import { useNavigate } from "react-router-dom";
@@ -112,7 +112,6 @@ const AccountSettings = () => {
 
   return (
     <div className="max-w-full mx-auto">
-      <ToastContainer />
 
       <div className="flex items-center mb-8">
         <div className="text-2xl font-medium text-gray-800">

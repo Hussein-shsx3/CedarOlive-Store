@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Star, Heart, ShoppingCart, Trash2 } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   addToWishlist,
   removeFromWishlist,
 } from "../../api/wishlist/wishlistApi";
-import { addToCart } from "../../redux/cartSlice"; // Assuming you have this action
+import { addToCart } from "../../redux/cartSlice";
+import { toast } from "react-toastify";
 
 const Product = ({
   product,
@@ -15,14 +16,40 @@ const Product = ({
   showWishlistRemoveButton = false,
 }) => {
   const dispatch = useDispatch();
+  // Get current user from Redux store
+  const user = useSelector((state) => state.user.currentUser);
   const [wishlistStatus, setWishlistStatus] = useState(isInWishlist);
   const [isProcessingWishlist, setIsProcessingWishlist] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-  // Update wishlist status when prop changes
+  // Check if user is authenticated
+  const isAuthenticated = !!user;
+
+  // Check if product is in wishlist on component mount and when user/product changes
   useEffect(() => {
-    setWishlistStatus(isInWishlist);
-  }, [isInWishlist]);
+    // First check the passed prop
+    if (isInWishlist) {
+      setWishlistStatus(true);
+      return;
+    }
+
+    // Then check from user data if available
+    if (isAuthenticated && user.wishlist && user.wishlist.length > 0) {
+      const productId = product._id || product.id;
+      // Check if the product ID exists in the user's wishlist array
+      const isProductInWishlist = user.wishlist.some((wishlistItemId) => {
+        // Convert to string for comparison if needed
+        const wishlistId = wishlistItemId.toString
+          ? wishlistItemId.toString()
+          : wishlistItemId;
+        const prodId = productId.toString ? productId.toString() : productId;
+        return wishlistId === prodId;
+      });
+      setWishlistStatus(isProductInWishlist);
+    } else {
+      setWishlistStatus(false);
+    }
+  }, [isInWishlist, product, user, isAuthenticated]);
 
   const formatPrice = (price) => {
     return typeof price === "number" ? `$${price.toFixed(2)}` : price;
@@ -66,6 +93,12 @@ const Product = ({
     e.preventDefault();
     e.stopPropagation();
 
+    if (!isAuthenticated) {
+      // Redirect to login page or show login modal
+      console.log("Please login to add items to wishlist");
+      return;
+    }
+
     if (isProcessingWishlist) return;
 
     setIsProcessingWishlist(true);
@@ -89,6 +122,7 @@ const Product = ({
     e.preventDefault();
     e.stopPropagation();
 
+    if (!isAuthenticated) return;
     if (isProcessingWishlist) return;
 
     setIsProcessingWishlist(true);
@@ -126,15 +160,21 @@ const Product = ({
     try {
       dispatch(
         addToCart({
-          productId: product._id || product.id,
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image || product.images[0],
           quantity: 1,
-          product: {
-            name: product.name,
-            price: product.price,
-            image: product.images?.[0] || product.image,
-          },
         })
       );
+      toast.success(`${product.name} added to cart successfully!`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       setTimeout(() => setIsAddingToCart(false), 500);
     } catch (error) {
       console.error("Failed to add to cart:", error);
@@ -151,7 +191,7 @@ const Product = ({
       : product.image;
 
   return (
-    <div className="w-full overflow-hidden group bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+    <div className="w-full overflow-hidden group transition-all duration-300">
       <div className="relative">
         <Link to={`/product/${product._id || product.id}`} className="block">
           {/* Image container with aspect ratio */}
@@ -187,47 +227,51 @@ const Product = ({
 
         {/* Action buttons */}
         <div className="absolute top-3 right-3 flex flex-col gap-2 transition-opacity duration-300">
-          {showWishlistRemoveButton ? (
-            <button
-              className={`p-2 rounded-full shadow-md bg-red-50 text-red-500 hover:bg-red-100 transition-colors`}
-              onClick={handleRemoveFromWishlist}
-              disabled={isProcessingWishlist}
-              type="button"
-              aria-label="Remove from wishlist"
-            >
-              <Trash2 size={18} />
-            </button>
-          ) : (
-            <button
-              className={`p-2 rounded-full shadow-md transition-colors ${
-                wishlistStatus
-                  ? "bg-red-50 text-red-500 hover:bg-red-100"
-                  : "bg-white text-gray-700 hover:text-red-500 hover:bg-red-50"
-              }`}
-              onClick={
-                wishlistStatus ? handleRemoveFromWishlist : handleAddToWishlist
-              }
-              disabled={isProcessingWishlist}
-              type="button"
-              aria-label={
-                wishlistStatus ? "Remove from wishlist" : "Add to wishlist"
-              }
-            >
-              {isProcessingWishlist ? (
-                <span className="animate-pulse">
+          {isAuthenticated ? (
+            showWishlistRemoveButton ? (
+              <button
+                className="p-2 rounded-full shadow-md bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
+                onClick={handleRemoveFromWishlist}
+                disabled={isProcessingWishlist}
+                type="button"
+                aria-label="Remove from wishlist"
+              >
+                <Trash2 size={18} />
+              </button>
+            ) : (
+              <button
+                className={`p-2 rounded-full shadow-md transition-colors ${
+                  wishlistStatus
+                    ? "bg-red-50 text-red-500 hover:bg-red-100"
+                    : "bg-white text-gray-700 hover:text-red-500 hover:bg-red-50"
+                }`}
+                onClick={
+                  wishlistStatus
+                    ? handleRemoveFromWishlist
+                    : handleAddToWishlist
+                }
+                disabled={isProcessingWishlist}
+                type="button"
+                aria-label={
+                  wishlistStatus ? "Remove from wishlist" : "Add to wishlist"
+                }
+              >
+                {isProcessingWishlist ? (
+                  <span className="animate-pulse">
+                    <Heart
+                      size={18}
+                      fill={wishlistStatus ? "currentColor" : "none"}
+                    />
+                  </span>
+                ) : (
                   <Heart
                     size={18}
                     fill={wishlistStatus ? "currentColor" : "none"}
                   />
-                </span>
-              ) : (
-                <Heart
-                  size={18}
-                  fill={wishlistStatus ? "currentColor" : "none"}
-                />
-              )}
-            </button>
-          )}
+                )}
+              </button>
+            )
+          ) : null}
 
           <button
             className={`p-2 rounded-full shadow-md ${
@@ -246,13 +290,13 @@ const Product = ({
       </div>
 
       {/* Product details */}
-      <div className="p-4 space-y-2">
+      <div className="py-4 space-y-2">
         <Link
           to={`/product/${product._id || product.id}`}
           className="block group"
         >
           <div className="flex justify-between items-start">
-            <h3 className="text-sm font-medium line-clamp-1 text-gray-800 group-hover:text-blue-600 transition-colors">
+            <h3 className="text-sm font-semibold line-clamp-1 text-gray-800 group-hover:text-black transition-colors">
               {product.name}
             </h3>
             {product.isNew && (
@@ -267,7 +311,7 @@ const Product = ({
           </p>
 
           {/* Ratings */}
-          <div className="flex items-center">
+          <div className="flex items-center mt-[5px]">
             {renderStars(product.ratingsAverage)}
             {product.ratingsQuantity > 0 && (
               <span className="text-xs text-gray-500 ml-1">
@@ -288,33 +332,6 @@ const Product = ({
             )}
           </div>
         </Link>
-
-        {/* Action buttons */}
-        <div className="grid grid-cols-2 gap-2 pt-3">
-          <button
-            className={`bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-medium py-2 px-3 rounded-md transition-colors flex items-center justify-center gap-1 ${
-              wishlistStatus ? "bg-red-50 text-red-500 hover:bg-red-100" : ""
-            }`}
-            onClick={
-              wishlistStatus ? handleRemoveFromWishlist : handleAddToWishlist
-            }
-            disabled={isProcessingWishlist}
-            type="button"
-          >
-            <Heart size={16} fill={wishlistStatus ? "currentColor" : "none"} />
-            <span>{wishlistStatus ? "Remove" : "Wishlist"}</span>
-          </button>
-
-          <button
-            className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-3 rounded-md transition-colors flex items-center justify-center gap-1"
-            onClick={handleAddToCart}
-            disabled={isAddingToCart}
-            type="button"
-          >
-            <ShoppingCart size={16} />
-            <span>{isAddingToCart ? "Adding..." : "Cart"}</span>
-          </button>
-        </div>
       </div>
     </div>
   );

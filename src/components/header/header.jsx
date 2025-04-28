@@ -219,7 +219,7 @@ const Header = () => {
               {user && user.role === "admin" && (
                 <Link
                   to="/admin"
-                  className="hidden md:flex items-center px-3 py-2 bg-secondary text-white rounded-md hover:bg-[#9a4a25] transition-colors duration-300 border border-secondary"
+                  className="hidden md:flex items-center px-3 py-2 bg-secondary text-white hover:bg-[#9a4a25] transition-colors duration-300 border border-secondary"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -293,7 +293,7 @@ const Header = () => {
                     </button>
 
                     <div
-                      className={`absolute right-0 w-56 mt-2 bg-white rounded-md shadow-lg z-50 transition-all duration-200 ease-in-out ${
+                      className={`absolute right-0 w-56 mt-2 bg-white rounded-sm shadow-lg z-50 transition-all duration-200 ease-in-out ${
                         isProfileOpen
                           ? "opacity-100 scale-100"
                           : "opacity-0 scale-95 pointer-events-none"
@@ -303,7 +303,7 @@ const Header = () => {
                         <p className="font-medium">{user.name}</p>
                         <p className="text-sm text-gray-500">{user.email}</p>
                         {user.role === "admin" && (
-                          <span className="inline-block bg-secondary text-white text-xs px-2 py-1 rounded-sm mt-1">
+                          <span className="inline-block bg-secondary text-white text-xs px-2 py-1 mt-1">
                             Admin
                           </span>
                         )}
@@ -312,7 +312,7 @@ const Header = () => {
                         <div className="p-3 border-b">
                           <button
                             onClick={goToAdminDashboard}
-                            className="w-full flex items-center justify-center py-2 bg-secondary text-white rounded hover:bg-[#9a4a25] transition-colors duration-300"
+                            className="w-full flex items-center justify-center py-2 bg-secondary text-white hover:bg-[#9a4a25] transition-colors duration-300"
                           >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -481,7 +481,7 @@ const Header = () => {
                     <div className="flex justify-between mb-4">
                       <span className="font-medium">Subtotal</span>
                       <span className="font-medium">
-                        ${totalAmount.toFixed(2)} USD
+                        ${totalAmount?.toFixed(2)} USD
                       </span>
                     </div>
                     <button
