@@ -3,14 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/authSlice";
 import { useNavigate, Outlet, Link, useLocation } from "react-router-dom";
 import Cookies from "universal-cookie";
-import {
-  Camera,
-  Package,
-  Heart,
-  LogOut,
-  User,
-  Settings,
-} from "lucide-react";
+import { Camera, Package, Heart, LogOut, User, Settings } from "lucide-react";
 import Header from "../../components/header/header";
 
 const cookies = new Cookies();

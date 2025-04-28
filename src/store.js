@@ -11,6 +11,7 @@ import contactSlice from "./redux/contactSlice";
 import productSlice from "./redux/productSlice";
 import reviewSlice from "./redux/reviewSlice";
 import orderSlice from "./redux/orderSlice";
+import wishlistSlice from "./redux/wishlistSlice";
 
 // User slice persist configuration with expiration
 const userPersistConfig = {
@@ -60,6 +61,7 @@ const rootReducer = combineReducers({
   product: productSlice,
   review: reviewSlice,
   payment: orderSlice,
+  wishlist: wishlistSlice,
 });
 
 // Create the store
