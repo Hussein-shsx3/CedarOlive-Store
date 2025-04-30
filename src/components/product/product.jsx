@@ -21,6 +21,7 @@ const Product = ({
   const [wishlistStatus, setWishlistStatus] = useState(isInWishlist);
   const [isProcessingWishlist, setIsProcessingWishlist] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   // Check if user is authenticated
   const isAuthenticated = !!user;
@@ -148,6 +149,21 @@ const Product = ({
       });
   };
 
+  // Handle quantity change
+  const increaseQuantity = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuantity((prev) => prev + 1);
+  };
+
+  const decreaseQuantity = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (quantity > 1) {
+      setQuantity((prev) => prev - 1);
+    }
+  };
+
   // Handle add to cart
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -160,14 +176,18 @@ const Product = ({
     try {
       dispatch(
         addToCart({
-          id: product.id,
+          id: product._id || product.id,
           name: product.name,
           price: product.price,
-          image: product.image || product.images[0],
-          quantity: 1,
+          image:
+            product.image ||
+            (product.images && product.images.length > 0
+              ? product.images[0]
+              : null),
+          quantity: quantity,
         })
       );
-      toast.success(`${product.name} added to cart successfully!`, {
+      toast.success(`${quantity} ${product.name} added to cart successfully!`, {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -175,6 +195,9 @@ const Product = ({
         pauseOnHover: true,
         draggable: true,
       });
+
+      // Reset quantity after adding to cart
+      setQuantity(1);
       setTimeout(() => setIsAddingToCart(false), 500);
     } catch (error) {
       console.error("Failed to add to cart:", error);
@@ -273,6 +296,7 @@ const Product = ({
             )
           ) : null}
 
+          {/* Add to cart button */}
           <button
             className={`p-2 rounded-full shadow-md ${
               isAddingToCart

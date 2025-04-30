@@ -147,17 +147,6 @@ const PersonalInformation = () => {
 
   return (
     <div>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-semibold text-title">
           Personal Information
